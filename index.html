@@ -449,7 +449,7 @@
         </label>
     </div>
     
-    <!-- 每日反思區域 -->
+    <!-- 每日紀錄區域 -->
     <div style="background: #CAFOF8; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
         <h3 style="margin: 0 0 15px 0; color: #4a5568; font-weight: 300;">每日紀錄</h3>
         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
@@ -916,7 +916,11 @@ const dailyNotes = [
     "妳是最棒的寶貝",
     "慢慢來就好了，我會陪妳的",
     "抱抱，喜歡妳喔",
-    "今天也一起加油吧"
+    "今天也一起加油吧",
+    "很喜歡妳喔",
+    "這也太難弄了吧",
+    "肚子還有在痛嗎...",
+    
 ];
 
 function updateDailyNote() {
@@ -1367,7 +1371,7 @@ function checkPracticeHours() {
     }
 }
 
-// 反思功能
+// 紀錄功能
 function saveReflection(person) {
     const date = document.getElementById(`reflectionDate${person}`).value;
     const practiceText = document.getElementById(`practiceReflection${person}`).value;
@@ -1466,7 +1470,7 @@ function showReflectionCalendar(person) {
         <div style="max-height: 400px; overflow-y: auto;">
     `;
     
-    // 獲取所有反思記錄
+    // 獲取所有每日記錄
     const reflections = [];
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
