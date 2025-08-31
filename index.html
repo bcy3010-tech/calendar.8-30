@@ -157,6 +157,8 @@
             min-height: 35px;
             display: flex;
             align-items: center;
+            letter-spacing: 0.8px;
+            word-spacing: 2px;
         }
 
         #blank-text {
@@ -685,7 +687,7 @@
         <button type="button" onclick="saveBlankText()" style="margin-top: 15px; padding: 12px 24px; background: #FFECF5; color: #333; border: 3px solid #E6B3D6; border-radius: 5px; cursor: pointer; font-weight: bold;">儲存 💕</button>
     </div>
     <div style="text-align: center; margin-top: 30px;">
-        <img src="./image.jpg" alt="原本的圖片" style="max-width: 300px; height: auto;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <img src="兔子.jpg" alt="兔子" class="blank-image-preview">
         <p style="display: none; color: #666;">圖片載入中...</p>
     </div>
 </section>
@@ -1177,6 +1179,16 @@ function saveBlankText() {
     document.body.appendChild(popup);
     
     setTimeout(() => popup.remove(), 2000);
+    
+    // 獲取當前月份並觸發特效
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1; // JavaScript月份是0-based，所以要+1
+    
+    // 觸發月份特別效果
+    setTimeout(() => {
+        triggerMonthSpecialEffect(currentYear, currentMonth);
+    }, 800);
     
     // 同時儲存到雲端
     setTimeout(() => {
@@ -1744,6 +1756,110 @@ function loadReflection(person) {
     }
 }
 
+// 編輯反思記錄
+function editReflection(person, date, type) {
+    const storageKey = `reflection_${person}_${date}`;
+    const savedData = localStorage.getItem(storageKey);
+    
+    if (!savedData) return;
+    
+    const reflectionData = JSON.parse(savedData);
+    const currentText = type === 'practice' ? reflectionData.practice : reflectionData.study;
+    
+    const newText = prompt(`編輯${type === 'practice' ? '🍮 學習紀錄' : '📚 學習內容'}：`, currentText);
+    
+    if (newText !== null) {
+        if (type === 'practice') {
+            reflectionData.practice = newText.trim();
+        } else {
+            reflectionData.study = newText.trim();
+        }
+        
+        localStorage.setItem(storageKey, JSON.stringify(reflectionData));
+        
+        // 顯示成功訊息
+        const popup = document.createElement('div');
+        popup.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10001;
+            padding: 12px 20px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        `;
+        popup.textContent = '✏️ 已更新記錄！';
+        document.body.appendChild(popup);
+        
+        setTimeout(() => popup.remove(), 2000);
+        
+        // 重新開啟紀錄本
+        document.querySelector('.modal').remove();
+        showReflectionCalendar(person);
+        
+        // 同步到雲端
+        setTimeout(() => {
+            saveToFirebase();
+        }, 500);
+    }
+}
+
+// 刪除反思記錄項目
+function deleteReflectionEntry(person, date, type) {
+    if (confirm(`確定要刪除這個${type === 'practice' ? '🍮 學習紀錄' : '📚 學習內容'}嗎？`)) {
+        const storageKey = `reflection_${person}_${date}`;
+        const savedData = localStorage.getItem(storageKey);
+        
+        if (savedData) {
+            const reflectionData = JSON.parse(savedData);
+            
+            if (type === 'practice') {
+                reflectionData.practice = '';
+            } else {
+                reflectionData.study = '';
+            }
+            
+            // 如果兩個欄位都空了，就刪除整個記錄
+            if (!reflectionData.practice && !reflectionData.study) {
+                localStorage.removeItem(storageKey);
+            } else {
+                localStorage.setItem(storageKey, JSON.stringify(reflectionData));
+            }
+            
+            // 顯示刪除成功訊息
+            const popup = document.createElement('div');
+            popup.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10001;
+                padding: 12px 20px;
+                background: #ff6b6b;
+                color: white;
+                border-radius: 8px;
+                font-weight: bold;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+            popup.textContent = '🗑️ 已刪除記錄！';
+            document.body.appendChild(popup);
+            
+            setTimeout(() => popup.remove(), 2000);
+            
+            // 重新開啟紀錄本
+            document.querySelector('.modal').remove();
+            showReflectionCalendar(person);
+            
+            // 同步到雲端
+            setTimeout(() => {
+                saveToFirebase();
+            }, 500);
+        }
+    }
+}
+
 function showReflectionCalendar(person) {
     const modal = document.createElement('div');
     modal.style.cssText = `
@@ -1851,11 +1967,38 @@ function showReflectionCalendar(person) {
                             background: rgba(255, 234, 167, 0.3); 
                             border-radius: 10px;
                             border-left: 4px solid #ffd93d;
+                            position: relative;
                         ">
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                <span style="font-size: 1.1em;">🎹</span>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div style="flex: 1;">
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                        <span style="font-size: 1.1em;">🍮</span>
+                                    </div>
+                                    <div style="color: #5d4e37; line-height: 1.5; padding-left: 24px;">${reflection.practice}</div>
+                                </div>
+                                <div style="display: flex; gap: 5px; margin-left: 10px;">
+                                    <button onclick="editReflection('${person}', '${reflection.date}', 'practice')" style="
+                                        background: #4299e1; 
+                                        color: white; 
+                                        border: none; 
+                                        padding: 4px 8px; 
+                                        border-radius: 4px; 
+                                        cursor: pointer;
+                                        font-size: 11px;
+                                        font-weight: 500;
+                                    ">編輯</button>
+                                    <button onclick="deleteReflectionEntry('${person}', '${reflection.date}', 'practice')" style="
+                                        background: #ff6b6b; 
+                                        color: white; 
+                                        border: none; 
+                                        padding: 4px 8px; 
+                                        border-radius: 4px; 
+                                        cursor: pointer;
+                                        font-size: 11px;
+                                        font-weight: 500;
+                                    ">刪除</button>
+                                </div>
                             </div>
-                            <div style="color: #5d4e37; line-height: 1.5; padding-left: 24px;">${reflection.practice}</div>
                         </div>
                     ` : ''}
                     ${reflection.study ? `
@@ -1864,11 +2007,38 @@ function showReflectionCalendar(person) {
                             background: rgba(255, 234, 167, 0.3); 
                             border-radius: 10px;
                             border-left: 4px solid #ffd93d;
+                            position: relative;
                         ">
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                <span style="font-size: 1.1em;">📚</span>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div style="flex: 1;">
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                        <span style="font-size: 1.1em;">📚</span>
+                                    </div>
+                                    <div style="color: #5d4e37; line-height: 1.5; padding-left: 24px;">${reflection.study}</div>
+                                </div>
+                                <div style="display: flex; gap: 5px; margin-left: 10px;">
+                                    <button onclick="editReflection('${person}', '${reflection.date}', 'study')" style="
+                                        background: #4299e1; 
+                                        color: white; 
+                                        border: none; 
+                                        padding: 4px 8px; 
+                                        border-radius: 4px; 
+                                        cursor: pointer;
+                                        font-size: 11px;
+                                        font-weight: 500;
+                                    ">編輯</button>
+                                    <button onclick="deleteReflectionEntry('${person}', '${reflection.date}', 'study')" style="
+                                        background: #ff6b6b; 
+                                        color: white; 
+                                        border: none; 
+                                        padding: 4px 8px; 
+                                        border-radius: 4px; 
+                                        cursor: pointer;
+                                        font-size: 11px;
+                                        font-weight: 500;
+                                    ">刪除</button>
+                                </div>
                             </div>
-                            <div style="color: #5d4e37; line-height: 1.5; padding-left: 24px;">${reflection.study}</div>
                         </div>
                     ` : ''}
                 </div>
@@ -2152,6 +2322,9 @@ function saveNewEvent(dateKey) {
     
     saveEventToDate(dateKey, event);
     
+    // 從dateKey解析年月日來觸發月份特效
+    const [year, month, day] = dateKey.split('-').map(Number);
+    
     // 顯示成功訊息
     const popup = document.createElement('div');
     popup.style.cssText = `
@@ -2174,6 +2347,11 @@ function saveNewEvent(dateKey) {
     // 關閉彈窗並重新生成日曆
     closeEventModal();
     regenerateYearlyCalendar();
+    
+    // 觸發月份特效
+    setTimeout(() => {
+        triggerMonthSpecialEffect(year, month);
+    }, 800);
     
     // 同步到雲端
     setTimeout(() => {
@@ -2229,6 +2407,146 @@ function regenerateYearlyCalendar() {
     const container = document.getElementById('yearly-calendar');
     container.innerHTML = '';
     generateYearlyCalendar();
+}
+
+// 月份特別效果
+function triggerMonthSpecialEffect(year, month) {
+    const monthEffects = {
+        1: { emoji: '❄️', name: '雪花', effect: createSnowfall },
+        2: { emoji: '💝', name: '愛心', effect: createHeartRain },
+        3: { emoji: '🌸', name: '櫻花', effect: createSakuraStorm },
+        4: { emoji: '🌷', name: '花朵', effect: createFlowerShower },
+        5: { emoji: '🌻', name: '陽光', effect: createSunbeams },
+        6: { emoji: '☀️', name: '夏日', effect: createSummerVibes },
+        7: { emoji: '🏖️', name: '海浪', effect: createBeachWaves },
+        8: { emoji: '🌺', name: '熱帶花', effect: createTropicalBloom },
+        9: { emoji: '🍂', name: '楓葉', effect: createAutumnLeaves },
+        10: { emoji: '🎃', name: '南瓜', effect: createHalloweenMagic },
+        11: { emoji: '🦃', name: '感恩', effect: createThankfulSparkles },
+        12: { emoji: '🎄', name: '聖誕', effect: createChristmasJoy }
+    };
+    
+    const effect = monthEffects[month];
+    if (effect) {
+        // 顯示月份特效提示
+        const popup = document.createElement('div');
+        popup.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10000;
+            padding: 25px 35px;
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            color: white;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: popupBounce 0.8s ease-out;
+        `;
+        popup.innerHTML = `
+            <div style="font-size: 2.5em; margin-bottom: 10px;">${effect.emoji}</div>
+            <div>${month}月的${effect.name}為你綻放！</div>
+        `;
+        
+        document.body.appendChild(popup);
+        
+        // 觸發特效
+        setTimeout(() => {
+            effect.effect();
+        }, 800);
+        
+        setTimeout(() => popup.remove(), 3000);
+    }
+}
+
+// 各種月份特效
+function createSnowfall() {
+    const snowflakes = ['❄️', '⛄', '🌨️'];
+    createParticleEffect(snowflakes, 20, 5000);
+}
+
+function createHeartRain() {
+    const hearts = ['💝', '💖', '💕', '💗', '💓', '💘'];
+    createParticleEffect(hearts, 15, 4000);
+}
+
+function createSakuraStorm() {
+    const sakura = ['🌸', '🌺', '🌷'];
+    createParticleEffect(sakura, 25, 4500);
+}
+
+function createFlowerShower() {
+    const flowers = ['🌷', '🌹', '🌻', '🌼', '🌺'];
+    createParticleEffect(flowers, 18, 4000);
+}
+
+function createSunbeams() {
+    const sun = ['☀️', '🌞', '⭐', '✨'];
+    createParticleEffect(sun, 12, 3500);
+}
+
+function createSummerVibes() {
+    const summer = ['☀️', '🏖️', '🌊', '🐚', '🦋'];
+    createParticleEffect(summer, 15, 4000);
+}
+
+function createBeachWaves() {
+    const beach = ['🌊', '🐚', '🏖️', '🦀', '🐠'];
+    createParticleEffect(beach, 16, 4200);
+}
+
+function createTropicalBloom() {
+    const tropical = ['🌺', '🌴', '🦜', '🍍', '🥥'];
+    createParticleEffect(tropical, 17, 4300);
+}
+
+function createAutumnLeaves() {
+    const autumn = ['🍂', '🍁', '🌰', '🎃'];
+    createParticleEffect(autumn, 22, 4800);
+}
+
+function createHalloweenMagic() {
+    const halloween = ['🎃', '👻', '🦇', '🕷️', '🍭'];
+    createParticleEffect(halloween, 20, 4500);
+}
+
+function createThankfulSparkles() {
+    const thankful = ['🦃', '🍂', '🌽', '🥧', '✨'];
+    createParticleEffect(thankful, 18, 4200);
+}
+
+function createChristmasJoy() {
+    const christmas = ['🎄', '🎅', '🎁', '⭐', '❄️', '🔔'];
+    createParticleEffect(christmas, 25, 5000);
+}
+
+// 通用粒子效果函數
+function createParticleEffect(particles, count, duration) {
+    for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+            const particle = document.createElement('span');
+            particle.style.cssText = `
+                position: fixed;
+                z-index: 9998;
+                pointer-events: none;
+                user-select: none;
+                font-size: ${15 + Math.random() * 20}px;
+                left: ${Math.random() * window.innerWidth}px;
+                top: -50px;
+                animation: fallDown ${3 + Math.random() * 2}s linear forwards;
+            `;
+            particle.textContent = particles[Math.floor(Math.random() * particles.length)];
+            
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 6000);
+        }, i * (duration / count));
+    }
 }
 
 // 顯示日期詳細資訊
@@ -2680,6 +2998,6 @@ window.addEventListener('load', function() {
 
 </script>
 
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'977e35e9d14ad2ff',t:'MTc1NjY2MDk1Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'977e6e2f43b8a112',t:'MTc1NjY2MzI1Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
 
