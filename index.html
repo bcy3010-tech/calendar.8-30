@@ -643,31 +643,60 @@
     <div class="two-column-container">
         <div class="weather-column">
             <h3 id="weather-title"></h3>
-            <div class="weather-content">今天會比較不會冷，有太陽，有空可以出去走走喔。</div>
+            <div class="weather-content">今天早上會有點冷，下午涼涼的，但妳應該都在宿舍，若有出門還是要帶件薄外套喔，不會下雨。</div>
         </div>
         <div class="note-column">
             <h3>今日便條</h3>
             <div class="note-content" id="daily-note">早安，妳已經很棒了喔！</div>
         </div>
     </div>
-    <h2>今日行程表</h2>
+    <h2 id="today-schedule-title">今日行程表</h2>
     <div class="schedule-row">
         <div class="schedule-table" id="schedule-table-a"><h3>Ania 的行程</h3></div>
         <div class="schedule-table" id="schedule-table-b"><h3>小狗 的行程</h3></div>
     </div>
     
     <!-- 待辦事項區域 -->
-    <div style="margin-top: 30px; background: #f8f6d0; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-        <h3 style="margin: 0 0 20px 0; color: #333; display: flex; align-items: center; gap: 10px;">
-            📝 待辦事項
-        </h3>
-        <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: end;">
-            <div style="flex: 1;">
-                <input type="text" id="todoInput" placeholder="輸入待辦事項..." style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
-            </div>
-            <button onclick="addTodo()" style="background: #4299e1; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; white-space: nowrap;">新增</button>
+    <div style="margin-top: 30px; background: linear-gradient(135deg, #f8fafc, #e2e8f0); padding: 25px; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h3 style="margin: 0; color: #1a202c; display: flex; align-items: center; gap: 12px; font-size: 1.3em; font-weight: 600;">
+                <span style="background: linear-gradient(135deg, #ffd93d, #ffb347); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.2em;">✓</span>
+                待辦事項
+            </h3>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; color: #4a5568;">
+                <input type="checkbox" id="todoEditMode" onchange="toggleTodoEditMode()" style="cursor: pointer; transform: scale(1.1);">
+                編輯模式
+            </label>
         </div>
-        <div id="todoList" style="display: grid; gap: 8px;">
+        <div style="display: flex; gap: 12px; margin-bottom: 25px; align-items: stretch;">
+            <div style="flex: 1; position: relative;">
+                <input type="text" id="todoInput" placeholder="今天要完成什麼呢？" style="
+                    width: 100%; 
+                    padding: 14px 20px; 
+                    border: 2px solid #e2e8f0; 
+                    border-radius: 12px; 
+                    font-size: 15px; 
+                    background: white;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                " onfocus="this.style.borderColor='#ffd93d'; this.style.boxShadow='0 4px 12px rgba(255, 217, 61, 0.15)'" onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'">
+            </div>
+            <button onclick="addTodo()" style="
+                background: linear-gradient(135deg, #ffd93d, #ffb347); 
+                color: #8b4513; 
+                border: none; 
+                padding: 14px 24px; 
+                border-radius: 12px; 
+                cursor: pointer; 
+                font-weight: 600; 
+                white-space: nowrap;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(255, 217, 61, 0.3);
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(255, 217, 61, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(255, 217, 61, 0.3)'">
+                <span style="margin-right: 6px;">+</span>新增
+            </button>
+        </div>
+        <div id="todoList" style="display: grid; gap: 12px;">
             <!-- 待辦事項將在這裡顯示 -->
         </div>
     </div>
@@ -687,7 +716,7 @@
         <button type="button" onclick="saveBlankText()" style="margin-top: 15px; padding: 12px 24px; background: #FFECF5; color: #333; border: 3px solid #E6B3D6; border-radius: 5px; cursor: pointer; font-weight: bold;">儲存 💕</button>
     </div>
     <div style="text-align: center; margin-top: 30px;">
-         <img src="兔子.jpg" alt="兔子" class="blank-image-preview">
+        <img src="兔子.jpg" alt="兔子" class="blank-image-preview">
         <p style="display: none; color: #666;">圖片載入中...</p>
     </div>
 </section>
@@ -937,7 +966,7 @@ async function saveToFirebase() {
 
         await setDoc(doc(db, "calendars", "main"), calendarData);
         console.log("資料已儲存到雲端！");
-        showSaveMessage("✅ 已同步到雲端！");
+        showSaveMessage("已同步！");
     } catch (error) {
         console.error("儲存失敗:", error);
         showSaveMessage("❌ 儲存失敗，請稍後再試");
@@ -969,7 +998,7 @@ async function loadFromFirebase() {
             }
             
             console.log("資料已從雲端載入！");
-            showSaveMessage("📥 已從雲端載入資料！");
+            showSaveMessage("已載入資料🍚");
             updateTodaySchedule();
         } else {
             console.log("雲端沒有儲存的資料");
@@ -1063,12 +1092,13 @@ function showSaveMessage(message) {
         right: 20px;
         z-index: 10001;
         padding: 12px 20px;
-        background: linear-gradient(135deg, #4CAF50, #45a049);
-        color: white;
+        background: linear-gradient(135deg, #f0f8ff, #e6f3ff);
+        color: #2d3748;
         border-radius: 8px;
         font-weight: bold;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         animation: slideIn 0.3s ease-out;
+        border: 1px solid #bee3f8;
     `;
 
     popup.textContent = message;
@@ -1229,11 +1259,20 @@ function updateDailyNote() {
     document.getElementById('daily-note').textContent = randomNote;
 }
 
-// 天氣
+// 天氣和今日行程標題
 function updateWeatherTitle(){
+    document.getElementById('weather-title').textContent = '今日天氣';
+}
+
+function updateTodayScheduleTitle(){
     const now = new Date();
-    const dateStr = `${now.getFullYear()}年${String(now.getMonth()+1).padStart(2,'0')}月${String(now.getDate()).padStart(2,'0')}日 天氣`;
-    document.getElementById('weather-title').textContent = dateStr;
+    const month = String(now.getMonth()+1).padStart(2,'0');
+    const date = String(now.getDate()).padStart(2,'0');
+    const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+    const dayOfWeek = dayNames[now.getDay()];
+    
+    const titleStr = `${month}月${date}日 (週${dayOfWeek})`;
+    document.getElementById('today-schedule-title').textContent = titleStr;
 }
 
 // 日行程表
@@ -3509,12 +3548,30 @@ function deleteTodo(id) {
     }, 500);
 }
 
+function toggleTodoEditMode() {
+    renderTodos();
+}
+
 function renderTodos() {
     const todoList = document.getElementById('todoList');
     const todos = JSON.parse(localStorage.getItem('todos') || '[]');
+    const editMode = document.getElementById('todoEditMode').checked;
     
     if (todos.length === 0) {
-        todoList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px; font-style: italic;">還沒有待辦事項</div>';
+        todoList.innerHTML = `
+            <div style="
+                text-align: center; 
+                color: #718096; 
+                padding: 40px 20px; 
+                background: white;
+                border-radius: 16px;
+                border: 2px dashed #e2e8f0;
+            ">
+                <div style="font-size: 2.5em; margin-bottom: 12px; opacity: 0.6;">📝</div>
+                <div style="font-size: 16px; font-weight: 500; margin-bottom: 6px;">還沒有待辦事項</div>
+                <div style="font-size: 14px; opacity: 0.8;">開始規劃美好的一天吧！</div>
+            </div>
+        `;
         return;
     }
     
@@ -3522,36 +3579,59 @@ function renderTodos() {
         <div style="
             display: flex; 
             align-items: center; 
-            gap: 12px; 
-            padding: 12px 15px; 
+            gap: 16px; 
+            padding: 16px 20px; 
             background: white; 
-            border-radius: 8px; 
+            border-radius: 16px; 
             border: 1px solid #e2e8f0;
-            ${todo.completed ? 'opacity: 0.6;' : ''}
-        ">
-            <input 
-                type="checkbox" 
-                ${todo.completed ? 'checked' : ''} 
-                onchange="toggleTodo(${todo.id})"
-                style="cursor: pointer; transform: scale(1.2);"
-            >
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            ${todo.completed ? 'opacity: 0.7; background: #f7fafc;' : ''}
+        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 16px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'">
+            <div style="
+                position: relative;
+                width: 20px;
+                height: 20px;
+            ">
+                <input 
+                    type="checkbox" 
+                    ${todo.completed ? 'checked' : ''} 
+                    onchange="toggleTodo(${todo.id})"
+                    style="
+                        width: 20px;
+                        height: 20px;
+                        cursor: pointer;
+                        accent-color: #ffd93d;
+                        transform: scale(1.2);
+                    "
+                >
+            </div>
             <span style="
                 flex: 1; 
-                ${todo.completed ? 'text-decoration: line-through; color: #666;' : 'color: #333;'}
-                font-size: 14px;
+                ${todo.completed ? 'text-decoration: line-through; color: #a0aec0;' : 'color: #2d3748;'}
+                font-size: 15px;
+                font-weight: 500;
+                line-height: 1.4;
             ">${todo.text}</span>
-            <button 
-                onclick="deleteTodo(${todo.id})" 
-                style="
-                    background: #ff6b6b; 
-                    color: white; 
-                    border: none; 
-                    padding: 4px 8px; 
-                    border-radius: 4px; 
-                    cursor: pointer; 
-                    font-size: 12px;
-                "
-            >刪除</button>
+            ${editMode ? `
+                <button 
+                    onclick="deleteTodo(${todo.id})" 
+                    style="
+                        background: linear-gradient(135deg, #fc8181, #f56565); 
+                        color: white; 
+                        border: none; 
+                        padding: 8px 12px; 
+                        border-radius: 8px; 
+                        cursor: pointer; 
+                        font-size: 12px;
+                        font-weight: 600;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 2px 8px rgba(245, 101, 101, 0.3);
+                    "
+                    onmouseover="this.style.transform='scale(1.05)'"
+                    onmouseout="this.style.transform='scale(1)'"
+                >刪除</button>
+            ` : ''}
         </div>
     `).join('');
 }
@@ -3559,6 +3639,7 @@ function renderTodos() {
 // 頁面載入時執行
 window.addEventListener('load', function() {
     updateWeatherTitle();
+    updateTodayScheduleTitle();
     updateDailyNote();
     createOpeningFlowerBouquet();
     loadBlankText();
@@ -3599,6 +3680,6 @@ window.addEventListener('load', function() {
 
 </script>
 
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'977ef69ff15e50ec',t:'MTc1NjY2ODg0Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'977ffea8131449b5',t:'MTc1NjY3OTY2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
 
