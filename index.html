@@ -716,7 +716,7 @@
         <button type="button" onclick="saveBlankText()" style="margin-top: 15px; padding: 12px 24px; background: #FFECF5; color: #333; border: 3px solid #E6B3D6; border-radius: 5px; cursor: pointer; font-weight: bold;">儲存 💕</button>
     </div>
     <div style="text-align: center; margin-top: 30px;">
-        <img src="兔子.jpg" alt="兔子" class="blank-image-preview">
+         <img src="兔子.jpg" alt="兔子" class="blank-image-preview">
         <p style="display: none; color: #666;">圖片載入中...</p>
     </div>
 </section>
@@ -1429,6 +1429,95 @@ function createFlowerBurst() {
     }
 }
 
+// 超大🍡特效動畫
+function createDangoEffect() {
+    const dango = document.createElement('span');
+    dango.style.cssText = `
+        position: fixed;
+        font-size: 150px;
+        z-index: 9999;
+        pointer-events: none;
+        user-select: none;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
+        filter: drop-shadow(0 0 20px rgba(255, 182, 193, 0.8));
+    `;
+    dango.textContent = '🍡';
+    
+    const duration = 2;
+    dango.style.animation = `superDangoBurst ${duration}s ease-out forwards`;
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes superDangoBurst {
+            0% { 
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            30% { 
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+            70% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(dango);
+    
+    setTimeout(() => {
+        dango.remove();
+        style.remove();
+    }, duration * 1000);
+}
+
+// 手機通知功能
+async function requestNotificationPermission() {
+    if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        return permission === 'granted';
+    }
+    return false;
+}
+
+function sendNotification(title, body, icon = '🍡') {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        const notification = new Notification(title, {
+            body: body,
+            icon: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                    <text y="80" font-size="80">${icon}</text>
+                </svg>
+            `),
+            badge: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                    <text y="80" font-size="80">🍡</text>
+                </svg>
+            `),
+            tag: 'calendar-notification',
+            requireInteraction: false,
+            silent: false
+        });
+        
+        // 3秒後自動關閉通知
+        setTimeout(() => {
+            notification.close();
+        }, 3000);
+        
+        return notification;
+    }
+    return null;
+}
+
 // 開場花束動畫
 function createOpeningFlowerBouquet() {
     const flowers = ['🌸', '🌺', '🌻', '🌷', '🌹', '💐', '🌼', '🏵️'];
@@ -1879,6 +1968,10 @@ function saveReflection(person) {
     const storageKey = `reflection_${person}_${date}`;
     localStorage.setItem(storageKey, JSON.stringify(reflectionData));
     
+    // 清空輸入框
+    document.getElementById(`practiceReflection${person}`).value = '';
+    document.getElementById(`studyReflection${person}`).value = '';
+    
     // 顯示儲存成功訊息
     const popup = document.createElement('div');
     popup.style.cssText = `
@@ -1896,8 +1989,8 @@ function saveReflection(person) {
     popup.textContent = '已儲存！';
     document.body.appendChild(popup);
     
-    // 觸發花花動畫
-    createFlowerBurst();
+    // 觸發🍡動畫
+    createDangoEffect();
     
     setTimeout(() => popup.remove(), 2000);
     
@@ -2419,6 +2512,11 @@ function showEventModal(year, month, day) {
                             <div style="font-weight: 600; color: #8b4513;">${event.title}</div>
                             ${event.startTime || event.endTime ? `<div style="font-size: 0.85em; color: #8b4513; margin-top: 2px;">⏰ ${event.startTime || ''}${event.startTime && event.endTime ? ' - ' : ''}${event.endTime || ''}</div>` : ''}
                             ${event.description ? `<div style="font-size: 0.9em; color: #666; margin-top: 3px;">${event.description}</div>` : ''}
+                            ${event.notifyAnia || event.notifyDog ? `<div style="font-size: 0.8em; color: #8b4513; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+                                <span>🔔</span>
+                                ${event.notifyAnia ? '<span>🍜</span>' : ''}
+                                ${event.notifyDog ? '<span>🍙</span>' : ''}
+                            </div>` : ''}
                         </div>
                         <button onclick="deleteEvent('${dateKey}', ${index})" style="
                             background: #ff6b6b; 
@@ -2452,14 +2550,30 @@ function showEventModal(year, month, day) {
                     <input type="time" id="eventEndTime" style="width: 100%;">
                 </div>
             </div>
-            <select id="eventType">
-                <option value="work">工作/學習</option>
-                <option value="leisure">休閒</option>
-                <option value="travel">旅遊</option>
-                <option value="appointment">約會/聚會</option>
-                <option value="reminder">提醒事項</option>
-                <option value="other">其他</option>
-            </select>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 0.9em; color: #8b4513; font-weight: 600;">📋 事項類型</label>
+                <select id="eventType">
+                    <option value="work">工作/學習</option>
+                    <option value="leisure">休閒</option>
+                    <option value="travel">旅遊</option>
+                    <option value="appointment">約會/聚會</option>
+                    <option value="reminder">提醒事項</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 0.9em; color: #8b4513; font-weight: 600;">通知對象</label>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px;">
+                        <input type="checkbox" id="notifyAnia" style="cursor: pointer; transform: scale(1.1);">
+                        <span>🍜 Ania</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px;">
+                        <input type="checkbox" id="notifyDog" style="cursor: pointer; transform: scale(1.1);">
+                        <span>🍙 小狗</span>
+                    </label>
+                </div>
+            </div>
             <div class="event-form-buttons">
                 <button class="save-btn" onclick="saveNewEvent('${dateKey}')">儲存事項</button>
                 <button class="cancel-btn" onclick="closeEventModal()">關閉</button>
@@ -2490,6 +2604,8 @@ function saveNewEvent(dateKey) {
     const startTime = document.getElementById('eventStartTime').value;
     const endTime = document.getElementById('eventEndTime').value;
     const type = document.getElementById('eventType').value;
+    const notifyAnia = document.getElementById('notifyAnia').checked;
+    const notifyDog = document.getElementById('notifyDog').checked;
     
     if (!title) {
         alert('請輸入事項標題！');
@@ -2502,6 +2618,8 @@ function saveNewEvent(dateKey) {
         startTime: startTime,
         endTime: endTime,
         type: type,
+        notifyAnia: notifyAnia,
+        notifyDog: notifyDog,
         createdAt: new Date().toISOString()
     };
     
@@ -3636,6 +3754,261 @@ function renderTodos() {
     `).join('');
 }
 
+// 檢查今日事項並發送通知
+function checkTodayEventsAndNotify() {
+    const currentUser = getCurrentUser();
+    if (!currentUser) return; // 如果沒有選擇用戶，不發送通知
+    
+    const today = new Date();
+    const dateKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const events = getEventsForDate(dateKey);
+    
+    if (events.length === 0) return;
+    
+    // 檢查是否已經通知過今天的事項
+    const lastNotifyDate = localStorage.getItem(`lastNotifyDate_${currentUser}`);
+    if (lastNotifyDate === dateKey) return;
+    
+    // 根據當前用戶篩選需要通知的事項
+    const notifyEvents = events.filter(event => {
+        if (currentUser === 'ania') {
+            return event.notifyAnia;
+        } else if (currentUser === 'dog') {
+            return event.notifyDog;
+        }
+        return false;
+    });
+    
+    if (notifyEvents.length > 0) {
+        // 發送通知
+        notifyEvents.forEach((event, index) => {
+            setTimeout(() => {
+                const userName = currentUser === 'ania' ? 'Ania' : '小狗';
+                const userEmoji = currentUser === 'ania' ? '🍜' : '🍙';
+                const timeText = event.startTime ? ` (${event.startTime})` : '';
+                
+                sendNotification(
+                    `📅 ${userName}${userEmoji} 今日提醒`,
+                    `${event.title}${timeText}`,
+                    '📅'
+                );
+            }, index * 2000); // 每個通知間隔2秒
+        });
+        
+        // 記錄已通知的日期（按用戶分別記錄）
+        localStorage.setItem(`lastNotifyDate_${currentUser}`, dateKey);
+        
+        // 顯示今日事項摘要
+        showTodayEventsSummary(notifyEvents);
+    }
+}
+
+// 顯示今日事項摘要
+function showTodayEventsSummary(events) {
+    const popup = document.createElement('div');
+    popup.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10001;
+        padding: 20px 25px;
+        background: linear-gradient(135deg, #fff9f0, #fef7ed);
+        border: 2px solid #ffeaa7;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        max-width: 350px;
+        animation: slideIn 0.5s ease-out;
+    `;
+    
+    let eventsHTML = events.map(event => {
+        let recipients = [];
+        if (event.notifyAnia) recipients.push('🍜');
+        if (event.notifyDog) recipients.push('🍙');
+        
+        return `
+            <div style="
+                padding: 8px 12px; 
+                background: rgba(255, 234, 167, 0.3); 
+                border-radius: 8px; 
+                margin-bottom: 8px;
+                font-size: 14px;
+            ">
+                <div style="font-weight: 600; color: #8b4513; display: flex; justify-content: space-between; align-items: center;">
+                    <span>${event.title}</span>
+                    <span>${recipients.join('')}</span>
+                </div>
+                ${event.startTime ? `<div style="font-size: 12px; color: #666; margin-top: 2px;">⏰ ${event.startTime}</div>` : ''}
+            </div>
+        `;
+    }).join('');
+    
+    popup.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+            <span style="font-size: 1.2em;">📅</span>
+            <div>
+                <div style="font-weight: 600; color: #8b4513; font-size: 16px;">今日事項提醒</div>
+                <div style="font-size: 12px; color: #666;">共 ${events.length} 項事項</div>
+            </div>
+        </div>
+        ${eventsHTML}
+        <div style="text-align: center; margin-top: 12px;">
+            <button onclick="this.closest('div').remove()" style="
+                background: #ffeaa7; 
+                border: none; 
+                padding: 6px 12px; 
+                border-radius: 6px; 
+                cursor: pointer; 
+                color: #8b4513; 
+                font-size: 12px;
+                font-weight: 500;
+            ">知道了</button>
+        </div>
+    `;
+    
+    document.body.appendChild(popup);
+    
+    // 10秒後自動關閉
+    setTimeout(() => {
+        if (popup.parentNode) {
+            popup.style.animation = 'slideIn 0.5s ease-out reverse';
+            setTimeout(() => popup.remove(), 500);
+        }
+    }, 10000);
+}
+
+// 用戶身份選擇
+function showUserSelection() {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 10002;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(5px);
+    `;
+    
+    const selectionBox = document.createElement('div');
+    selectionBox.style.cssText = `
+        background: linear-gradient(135deg, #fff9f0, #fef7ed);
+        padding: 40px;
+        border-radius: 25px;
+        border: 3px solid #ffeaa7;
+        box-shadow: 0 25px 70px rgba(0,0,0,0.3);
+        text-align: center;
+        min-width: 350px;
+        animation: userSelectionBounce 0.6s ease-out;
+    `;
+    
+    selectionBox.innerHTML = `
+        <div style="font-size: 2.5em; margin-bottom: 20px;">👋</div>
+        <h2 style="margin: 0 0 25px 0; color: #8b4513; font-size: 1.5em; font-weight: 500;">歡迎使用行事曆！</h2>
+        <p style="margin: 0 0 30px 0; color: #8b4513; font-size: 1.1em;">請選擇你是誰，這樣就只會收到屬於你的通知：</p>
+        <div style="display: flex; gap: 20px; justify-content: center;">
+            <button onclick="setCurrentUser('ania')" style="
+                background: linear-gradient(135deg, #FADADD, #FFB6C1);
+                border: none;
+                padding: 20px 30px;
+                border-radius: 15px;
+                cursor: pointer;
+                font-size: 1.2em;
+                font-weight: 600;
+                color: #8b4513;
+                transition: all 0.3s ease;
+                box-shadow: 0 6px 20px rgba(250, 218, 221, 0.4);
+            " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(250, 218, 221, 0.6)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(250, 218, 221, 0.4)'">
+                🍜 我是 Ania
+            </button>
+            <button onclick="setCurrentUser('dog')" style="
+                background: linear-gradient(135deg, #dae8fc, #b3d9ff);
+                border: none;
+                padding: 20px 30px;
+                border-radius: 15px;
+                cursor: pointer;
+                font-size: 1.2em;
+                font-weight: 600;
+                color: #8b4513;
+                transition: all 0.3s ease;
+                box-shadow: 0 6px 20px rgba(218, 232, 252, 0.4);
+            " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(218, 232, 252, 0.6)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(218, 232, 252, 0.4)'">
+                🍙 我是小狗
+            </button>
+        </div>
+    `;
+    
+    // 添加彈跳動畫
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes userSelectionBounce {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            50% { transform: scale(1.1) rotate(0deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    modal.appendChild(selectionBox);
+    modal.id = 'userSelectionModal';
+    document.body.appendChild(modal);
+}
+
+function setCurrentUser(userType) {
+    localStorage.setItem('currentUser', userType);
+    
+    // 關閉選擇彈窗
+    const modal = document.getElementById('userSelectionModal');
+    if (modal) {
+        modal.style.animation = 'userSelectionBounce 0.4s ease-out reverse';
+        setTimeout(() => modal.remove(), 400);
+    }
+    
+    // 顯示歡迎訊息
+    const userName = userType === 'ania' ? 'Ania' : '小狗';
+    const userEmoji = userType === 'ania' ? '🍜' : '🍙';
+    
+    const welcomePopup = document.createElement('div');
+    welcomePopup.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10001;
+        padding: 15px 25px;
+        background: linear-gradient(135deg, #4CAF50, #45a049);
+        color: white;
+        border-radius: 12px;
+        font-weight: bold;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        animation: slideIn 0.5s ease-out;
+    `;
+    welcomePopup.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.2em;">${userEmoji}</span>
+            <div>歡迎 ${userName}！現在只會收到屬於你的通知了</div>
+        </div>
+    `;
+    
+    document.body.appendChild(welcomePopup);
+    
+    setTimeout(() => {
+        welcomePopup.style.animation = 'slideIn 0.5s ease-out reverse';
+        setTimeout(() => welcomePopup.remove(), 500);
+    }, 3000);
+    
+    // 檢查今日事項並發送通知
+    setTimeout(() => {
+        checkTodayEventsAndNotify();
+    }, 1000);
+}
+
+function getCurrentUser() {
+    return localStorage.getItem('currentUser');
+}
+
 // 頁面載入時執行
 window.addEventListener('load', function() {
     updateWeatherTitle();
@@ -3670,6 +4043,30 @@ window.addEventListener('load', function() {
         loadFromFirebase();
     }, 1000);
     
+    // 檢查是否已選擇用戶身份
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+        // 如果沒有選擇用戶，顯示選擇彈窗
+        setTimeout(() => {
+            showUserSelection();
+        }, 2000);
+    } else {
+        // 如果已選擇用戶，請求通知權限並檢查今日事項
+        setTimeout(() => {
+            requestNotificationPermission().then(granted => {
+                if (granted) {
+                    console.log('通知權限已獲得！');
+                    // 權限獲得後檢查今日事項
+                    setTimeout(() => {
+                        checkTodayEventsAndNotify();
+                    }, 1000);
+                } else {
+                    console.log('通知權限被拒絕');
+                }
+            });
+        }, 2000);
+    }
+    
     // 支援 Enter 鍵新增待辦事項
     document.getElementById('todoInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
@@ -3680,6 +4077,6 @@ window.addEventListener('load', function() {
 
 </script>
 
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'977ffea8131449b5',t:'MTc1NjY3OTY2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97801c743099e135',t:'MTc1NjY4MDg4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
 
