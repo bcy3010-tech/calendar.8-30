@@ -599,21 +599,25 @@
             }
             
             nav {
-                width: 150px;
+                width: 120px;
             }
             
             nav button {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
             }
             
             header {
-                padding: 10px 15px;
+                padding: 8px 12px;
+                grid-template-columns: 120px 1fr 120px;
             }
             
             h1 {
-                font-size: 2em;
+                font-size: 1.4em;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             
             .yearly-calendar {
@@ -652,8 +656,20 @@
     </div>
     <h2 id="today-schedule-title">今日行程表</h2>
     <div class="schedule-row">
-        <div class="schedule-table" id="schedule-table-a"><h3>Ania 的行程</h3></div>
-        <div class="schedule-table" id="schedule-table-b"><h3>小狗 的行程</h3></div>
+        <div class="schedule-table" id="schedule-table-a">
+            <h3 onclick="toggleScheduleTable('a')" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none;">
+                <span>Ania 的行程</span>
+                <span id="toggle-icon-a" style="font-size: 0.8em; transition: transform 0.3s ease;">▼</span>
+            </h3>
+            <div id="schedule-content-a"></div>
+        </div>
+        <div class="schedule-table" id="schedule-table-b">
+            <h3 onclick="toggleScheduleTable('b')" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none;">
+                <span>小狗 的行程</span>
+                <span id="toggle-icon-b" style="font-size: 0.8em; transition: transform 0.3s ease;">▼</span>
+            </h3>
+            <div id="schedule-content-b"></div>
+        </div>
     </div>
     
     <!-- 待辦事項區域 -->
@@ -716,7 +732,7 @@
         <button type="button" onclick="saveBlankText()" style="margin-top: 15px; padding: 12px 24px; background: #FFECF5; color: #333; border: 3px solid #E6B3D6; border-radius: 5px; cursor: pointer; font-weight: bold;">儲存 💕</button>
     </div>
     <div style="text-align: center; margin-top: 30px;">
-         <img src="兔子.jpg" alt="兔子" class="blank-image-preview">
+        <img src="./image.jpg" alt="原本的圖片" style="max-width: 300px; height: auto;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
         <p style="display: none; color: #666;">圖片載入中...</p>
     </div>
 </section>
@@ -1279,7 +1295,8 @@ function updateTodayScheduleTitle(){
 const times=["08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"];
 
 function createScheduleTable(tableId, person){
-    const table=document.getElementById(tableId);
+    const contentId = tableId.replace('schedule-table-', 'schedule-content-');
+    const content = document.getElementById(contentId);
     let html='';
     times.forEach(time=>{
         html+=`<div class="time-slot">
@@ -1287,7 +1304,7 @@ function createScheduleTable(tableId, person){
             <div class="schedule-display" data-time="${time}"></div>
         </div>`;
     });
-    table.innerHTML+=html;
+    content.innerHTML = html;
 }
 
 createScheduleTable('schedule-table-a','A');
@@ -1298,8 +1315,8 @@ function updateTodaySchedule() {
     const today = new Date().getDay();
     const todayColumn = today === 0 ? 7 : today;
     
-    const aDisplays = document.querySelectorAll('#schedule-table-a .schedule-display');
-    const bDisplays = document.querySelectorAll('#schedule-table-b .schedule-display');
+    const aDisplays = document.querySelectorAll('#schedule-content-a .schedule-display');
+    const bDisplays = document.querySelectorAll('#schedule-content-b .schedule-display');
     
     aDisplays.forEach(display => display.textContent = '');
     bDisplays.forEach(display => display.textContent = '');
@@ -1480,40 +1497,95 @@ function createDangoEffect() {
     }, duration * 1000);
 }
 
+// 行程表摺疊功能
+function toggleScheduleTable(person) {
+    const contentId = `schedule-content-${person}`;
+    const iconId = `toggle-icon-${person}`;
+    const content = document.getElementById(contentId);
+    const icon = document.getElementById(iconId);
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.textContent = '▼';
+        icon.style.transform = 'rotate(0deg)';
+    } else {
+        content.style.display = 'none';
+        icon.textContent = '▶';
+        icon.style.transform = 'rotate(-90deg)';
+    }
+}
+
 // 手機通知功能
 async function requestNotificationPermission() {
     if ('Notification' in window) {
-        const permission = await Notification.requestPermission();
-        return permission === 'granted';
+        try {
+            const permission = await Notification.requestPermission();
+            console.log('通知權限狀態:', permission);
+            return permission === 'granted';
+        } catch (error) {
+            console.error('請求通知權限時發生錯誤:', error);
+            return false;
+        }
+    } else {
+        console.log('此瀏覽器不支援通知功能');
+        return false;
     }
-    return false;
 }
 
 function sendNotification(title, body, icon = '🍡') {
-    if ('Notification' in window && Notification.permission === 'granted') {
-        const notification = new Notification(title, {
-            body: body,
-            icon: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                    <text y="80" font-size="80">${icon}</text>
-                </svg>
-            `),
-            badge: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                    <text y="80" font-size="80">🍡</text>
-                </svg>
-            `),
-            tag: 'calendar-notification',
-            requireInteraction: false,
-            silent: false
-        });
+    console.log('嘗試發送通知:', title, body);
+    
+    if ('Notification' in window) {
+        console.log('通知權限狀態:', Notification.permission);
         
-        // 3秒後自動關閉通知
-        setTimeout(() => {
-            notification.close();
-        }, 3000);
-        
-        return notification;
+        if (Notification.permission === 'granted') {
+            try {
+                const notification = new Notification(title, {
+                    body: body,
+                    icon: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                            <text y="80" font-size="80">${icon}</text>
+                        </svg>
+                    `),
+                    badge: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                            <text y="80" font-size="80">🍡</text>
+                        </svg>
+                    `),
+                    tag: 'calendar-notification-' + Date.now(),
+                    requireInteraction: false,
+                    silent: false,
+                    vibrate: [200, 100, 200]
+                });
+                
+                notification.onclick = function() {
+                    window.focus();
+                    notification.close();
+                };
+                
+                // 5秒後自動關閉通知
+                setTimeout(() => {
+                    notification.close();
+                }, 5000);
+                
+                console.log('通知已發送成功');
+                return notification;
+            } catch (error) {
+                console.error('發送通知時發生錯誤:', error);
+                return null;
+            }
+        } else if (Notification.permission === 'default') {
+            console.log('需要請求通知權限');
+            requestNotificationPermission().then(granted => {
+                if (granted) {
+                    sendNotification(title, body, icon);
+                }
+            });
+        } else {
+            console.log('通知權限被拒絕');
+        }
+    } else {
+        console.log('此瀏覽器不支援通知功能');
     }
     return null;
 }
@@ -2563,12 +2635,12 @@ function showEventModal(year, month, day) {
             </div>
             <div style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 8px; font-size: 0.9em; color: #8b4513; font-weight: 600;">通知對象</label>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px;">
+                <div style="display: flex; gap: 20px; align-items: center; flex-wrap: nowrap;">
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px; white-space: nowrap;">
                         <input type="checkbox" id="notifyAnia" style="cursor: pointer; transform: scale(1.1);">
                         <span>🍜 Ania</span>
                     </label>
-                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px;">
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px; white-space: nowrap;">
                         <input type="checkbox" id="notifyDog" style="cursor: pointer; transform: scale(1.1);">
                         <span>🍙 小狗</span>
                     </label>
@@ -4043,29 +4115,26 @@ window.addEventListener('load', function() {
         loadFromFirebase();
     }, 1000);
     
-    // 檢查是否已選擇用戶身份
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
-        // 如果沒有選擇用戶，顯示選擇彈窗
-        setTimeout(() => {
-            showUserSelection();
-        }, 2000);
-    } else {
-        // 如果已選擇用戶，請求通知權限並檢查今日事項
-        setTimeout(() => {
-            requestNotificationPermission().then(granted => {
-                if (granted) {
-                    console.log('通知權限已獲得！');
-                    // 權限獲得後檢查今日事項
-                    setTimeout(() => {
-                        checkTodayEventsAndNotify();
-                    }, 1000);
-                } else {
-                    console.log('通知權限被拒絕');
-                }
-            });
-        }, 2000);
-    }
+    // 先請求通知權限
+    setTimeout(() => {
+        requestNotificationPermission().then(granted => {
+            console.log('通知權限請求結果:', granted);
+            
+            // 檢查是否已選擇用戶身份
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                // 如果沒有選擇用戶，顯示選擇彈窗
+                setTimeout(() => {
+                    showUserSelection();
+                }, 1000);
+            } else {
+                // 如果已選擇用戶，檢查今日事項
+                setTimeout(() => {
+                    checkTodayEventsAndNotify();
+                }, 1000);
+            }
+        });
+    }, 1500);
     
     // 支援 Enter 鍵新增待辦事項
     document.getElementById('todoInput').addEventListener('keypress', function(e) {
@@ -4077,6 +4146,6 @@ window.addEventListener('load', function() {
 
 </script>
 
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97801c743099e135',t:'MTc1NjY4MDg4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9780299905e24f0e',t:'MTc1NjY4MTQxOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
 
