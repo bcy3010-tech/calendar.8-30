@@ -1485,7 +1485,7 @@ function showReflectionCalendar(person) {
     reflections.sort((a, b) => new Date(b.date) - new Date(a.date));
     
     if (reflections.length === 0) {
-        calendarHTML += '<p style="color: #718096; text-align: center;">還沒有任何反思記錄</p>';
+        calendarHTML += '<p style="color: #718096; text-align: center;">還沒有任何記錄</p>';
     } else {
         reflections.forEach(reflection => {
             calendarHTML += `
