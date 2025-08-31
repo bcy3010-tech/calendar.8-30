@@ -630,7 +630,7 @@
 <header>
     <nav>
         <button id="btn-page1" class="active" onclick="showPage(1)" title="行事曆">📅</button>
-        <button id="btn-page2" onclick="showPage(2); triggerSakura();" title="空白頁">🌸</button>
+        <button id="btn-page2" onclick="showPage(2); setTimeout(triggerSakura, 300);" title="空白頁">🌸</button>
         <button id="btn-page3" onclick="showPage(3)" title="Ania的週行程">🍜</button>
         <button id="btn-page4" onclick="showPage(4)" title="小狗的週行程">🍙</button>
         <button id="btn-page5" onclick="showPage(5)" title="年度行事曆">🍱</button>
@@ -657,7 +657,7 @@
     </div>
     
     <!-- 待辦事項區域 -->
-    <div style="margin-top: 30px; background: #f8f9fa; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <div style="margin-top: 30px; background: #f8f6d0; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
         <h3 style="margin: 0 0 20px 0; color: #333; display: flex; align-items: center; gap: 10px;">
             📝 待辦事項
         </h3>
@@ -687,7 +687,7 @@
         <button type="button" onclick="saveBlankText()" style="margin-top: 15px; padding: 12px 24px; background: #FFECF5; color: #333; border: 3px solid #E6B3D6; border-radius: 5px; cursor: pointer; font-weight: bold;">儲存 💕</button>
     </div>
     <div style="text-align: center; margin-top: 30px;">
-          <img src="兔子.jpg" alt="兔子" class="blank-image-preview">
+         <img src="兔子.jpg" alt="兔子" class="blank-image-preview">
         <p style="display: none; color: #666;">圖片載入中...</p>
     </div>
 </section>
@@ -707,7 +707,7 @@
     
     <!-- 每日反思區域 -->
     <div style="background: #FADADD; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-        <h3 style="margin: 0 0 15px 0; color: #4a5568; font-weight: 300;">每日紀錄</h3>
+        <h3 style="margin: 0 0 15px 0; color: #4a5568; font-weight: bold;">每日紀錄</h3>
         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
             <div>
                 <label style="display: block; margin-bottom: 10px; color: #4a5568; font-weight: 300;">選擇日期：</label>
@@ -766,7 +766,7 @@
                 <option value="#e1d5e7" style="background: #e1d5e7;">淡紫</option>
                 <option value="#f8cecc" style="background: #f8cecc;">淡紅</option>
                 <option value="#f5f5f5" style="background: #f5f5f5;">淡灰</option>
-                <option value="#fce5cd" style="background: #fce5cd;">淡粉</option>
+                <option value="#fff5fd" style="background: #fff5fd;">淡粉</option>
             </select>
         </label>
         <button type="button" onclick="addTask('A')">新增事項</button>
@@ -814,7 +814,7 @@
     
     <!-- 每日反思區域 -->
     <div style="background: #dae8fc; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-        <h3 style="margin: 0 0 15px 0; color: #4a5568; font-weight: 300;">每日紀錄</h3>
+        <h3 style="margin: 0 0 15px 0; color: #4a5568; font-weight: bold;">每日紀錄</h3>
         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
             <div>
                 <label style="display: block; margin-bottom: 10px; color: #4a5568; font-weight: 300;">選擇日期：</label>
@@ -857,9 +857,12 @@
         <label>事項：
             <select id="taskSelectB" onchange="handleTaskSelection('B')">
                 <option value="">選擇事項</option>
-                <option value="Orchestra">Orchestra</option>
+                <option value="Studio">Studio</option>
+                <option value="Rehearsal">Rehearsal</option>
+                <option value="Study: CARS">Study: CARS</option>
                 <option value="Study: Bio">Study: Bio</option>
-                <option value="Lesson">Lesson</option>
+                <option value="Study: Chem">Study: Chem</option>
+                <option value="Study: Phys">Study: Phys</option>
                 <option value="custom">其他（自訂）</option>
             </select>
             <input type="text" id="taskTextB" placeholder="輸入自訂事項" style="display: none; margin-top: 5px;">
@@ -873,7 +876,7 @@
                 <option value="#e1d5e7" style="background: #e1d5e7;">淡紫</option>
                 <option value="#f8cecc" style="background: #f8cecc;">淡紅</option>
                 <option value="#f5f5f5" style="background: #f5f5f5;">淡灰</option>
-                <option value="#fce5cd" style="background: #fce5cd;">淡粉</option>
+                <option value="#fff5fd" style="background: #fff5fd;">淡粉</option>
             </select>
         </label>
         <button type="button" onclick="addTask('B')">新增事項</button>
@@ -1142,6 +1145,10 @@ function showPage(pageNum){
         document.getElementById('btn-page4').classList.add('active');
         titleElement.textContent = '小狗的行事曆';
         headerElement.classList.remove('pink-header');
+        // 確保小狗的固定課程已載入
+        setTimeout(() => {
+            addFixedScheduleForDog();
+        }, 100);
     } else if(pageNum === 5){
         document.getElementById('page5').classList.add('active');
         document.getElementById('btn-page5').classList.add('active');
@@ -1213,7 +1220,8 @@ const dailyNotes = [
     "妳是最棒的寶貝",
     "慢慢來就好了，我會陪妳的",
     "抱抱，喜歡妳喔",
-    "今天也一起加油吧"
+    "今天也一起加油吧",
+    "愛妳喔！"
 ];
 
 function updateDailyNote() {
@@ -1296,6 +1304,7 @@ function updateTodaySchedule() {
 
 // 櫻花動畫
 function triggerSakura(){
+    console.log('觸發櫻花特效！'); // 除錯用
     let count = 0;
     const interval = setInterval(()=>{
         createSakura();
@@ -1308,13 +1317,20 @@ function createSakura(){
     const sakura=document.createElement('span');
     sakura.classList.add('sakura');
     sakura.textContent='🌸';
-    const size = 10 + Math.random()*20;
+    sakura.style.position = 'fixed';
+    sakura.style.zIndex = '9999';
+    sakura.style.pointerEvents = 'none';
+    sakura.style.userSelect = 'none';
+    sakura.style.top = '-50px';
+    const size = 15 + Math.random()*25;
     sakura.style.fontSize=size+'px';
     sakura.style.left = Math.random() * window.innerWidth + 'px';
     const duration = 3 + Math.random()*2;
     sakura.style.animation = `fallDown ${duration}s linear forwards`;
     document.body.appendChild(sakura);
-    setTimeout(()=>{ sakura.remove(); }, duration*1000);
+    setTimeout(()=>{ 
+        if(sakura.parentNode) sakura.remove(); 
+    }, duration*1000);
 }
 
 // 花花爆發動畫
@@ -1481,10 +1497,123 @@ function addFixedScheduleForAnia() {
                 task.style.border = "2px solid #666";
                 task.style.fontWeight = "bold";
                 
+                // 添加刪除按鈕（可編輯）
+                const delBtn = document.createElement("button");
+                delBtn.className = "delete-btn";
+                delBtn.textContent = "✕";
+                delBtn.onclick = () => {
+                    task.remove();
+                    updateTodaySchedule();
+                    if (task.textContent.includes('Practice')) {
+                        checkPracticeHours();
+                    }
+                    saveToFirebase();
+                };
+                
+                // 檢查編輯模式狀態
+                const editMode = document.getElementById('editModeA').checked;
+                if (editMode) {
+                    delBtn.classList.add('edit-mode');
+                }
+                
+                task.appendChild(delBtn);
+                
                 cell.appendChild(task);
             }
         });
     });
+}
+
+// 為小狗的行事曆添加固定課程
+function addFixedScheduleForDog() {
+    // 先清除現有的固定課程，避免重複
+    const existingTasks = document.querySelectorAll('#scheduleTableB .task');
+    existingTasks.forEach(task => {
+        if (task.textContent.includes('Orchestra') || 
+            task.textContent.includes('Music History') || 
+            task.textContent.includes('Music Theory') || 
+            task.textContent.includes('String Lit') || 
+            task.textContent.includes('Hospital Volunteer')) {
+            task.remove();
+        }
+    });
+    
+    const fixedClasses = [
+        // Orchestra: 週二四中午12:00~下午兩點
+        { days: [2, 4], startHour: 12, startMin: 0, endHour: 14, endMin: 0, subject: "Orchestra", color: "#d5e8d4" },
+        // Orchestra: 週三中午12:30~下午兩點20
+        { days: [3], startHour: 12, startMin: 30, endHour: 14, endMin: 20, subject: "Orchestra", color: "#d5e8d4" },
+        // Music History: 一三五的10:30~11:20
+        { days: [1, 3, 5], startHour: 10, startMin: 30, endHour: 11, endMin: 20, subject: "Music History", color: "#dae8fc" },
+        // Music Theory: 週一、三早上8:30~9:20
+        { days: [1, 3], startHour: 8, startMin: 30, endHour: 9, endMin: 20, subject: "Music Theory", color: "#e1d5e7" },
+        // String Lit: 週一、三下午2:30~4:00 (先加入，會在下層)
+        { days: [1, 3], startHour: 14, startMin: 30, endHour: 16, endMin: 0, subject: "String Lit", color: "#fff2cc" },
+        // Hospital Volunteer: 週一下午1:00~3:00 (後加入，會在上層)
+        { days: [1], startHour: 13, startMin: 0, endHour: 15, endMin: 0, subject: "Hospital Volunteer", color: "#a8d1fe" },
+        // Lesson: 週五早上9:30~10:30
+        { days: [5], startHour: 9, startMin: 30, endHour: 10, endMin: 30, subject: "Lesson", color: "#f8cecc" }
+    ];
+
+    console.log('開始添加小狗的固定課程...'); // 除錯用
+    
+    fixedClasses.forEach((classInfo, index) => {
+        classInfo.days.forEach(day => {
+            const startHour = classInfo.startHour;
+            const cell = document.querySelector(`#scheduleTableB td[data-day='${day}'][data-hour='${startHour}']`);
+            
+            console.log(`嘗試添加課程: ${classInfo.subject}, 日期: ${day}, 時間: ${startHour}, 找到格子:`, cell); // 除錯用
+            
+            if (cell) {
+                const totalMinutes = (classInfo.endHour * 60 + classInfo.endMin) - (classInfo.startHour * 60 + classInfo.startMin);
+                const heightPerMinute = 40/60;
+                const taskHeight = totalMinutes * heightPerMinute;
+                
+                const task = document.createElement("div");
+                task.className = "task dog-fixed-task";
+                task.textContent = classInfo.subject;
+                task.style.backgroundColor = classInfo.color;
+                task.style.top = `${classInfo.startMin * heightPerMinute}px`;
+                task.style.height = `${taskHeight}px`;
+                task.style.border = "2px solid #666";
+                task.style.fontWeight = "bold";
+                task.style.position = "absolute";
+                task.style.left = "2px";
+                task.style.right = "2px";
+                task.style.display = "flex";
+                task.style.justifyContent = "center";
+                task.style.alignItems = "center";
+                task.style.fontSize = "13px";
+                task.style.color = "#4a5568";
+                task.style.letterSpacing = "0.5px";
+                
+                // 添加刪除按鈕（可編輯）
+                const delBtn = document.createElement("button");
+                delBtn.className = "delete-btn";
+                delBtn.textContent = "✕";
+                delBtn.onclick = () => {
+                    task.remove();
+                    updateTodaySchedule();
+                    saveToFirebase();
+                };
+                
+                // 檢查編輯模式狀態
+                const editMode = document.getElementById('editModeB').checked;
+                if (editMode) {
+                    delBtn.classList.add('edit-mode');
+                }
+                
+                task.appendChild(delBtn);
+                
+                cell.appendChild(task);
+                console.log(`成功添加課程: ${classInfo.subject}`); // 除錯用
+            } else {
+                console.log(`找不到格子: day=${day}, hour=${startHour}`); // 除錯用
+            }
+        });
+    });
+    
+    console.log('小狗固定課程添加完成'); // 除錯用
 }
 
 // 編輯模式切換
@@ -2142,6 +2271,15 @@ function generateYearlyCalendar() {
                 dayCell.classList.add('today');
             }
             
+            // 檢查是否是Ania的生日 (10月22日)
+            if (monthIndex === 9 && day === 22) { // 10月是第9個月(0-based)
+                dayCell.style.background = 'linear-gradient(135deg, #ffc0cb, #ffb6c1, #ffd1dc)';
+                dayCell.style.color = '#8b4513';
+                dayCell.style.fontWeight = 'bold';
+                dayCell.style.boxShadow = '0 4px 15px rgba(255, 192, 203, 0.6)';
+                dayCell.innerHTML = `${day}<div style="font-size: 0.6em; margin-top: 1px;">🎂</div>`;
+            }
+            
             // 檢查是否有事項
             const dateKey = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const events = getEventsForDate(dateKey);
@@ -2153,6 +2291,14 @@ function generateYearlyCalendar() {
             
             // 添加點擊事件
             dayCell.addEventListener('click', () => {
+                // 如果是Ania的生日，觸發特別的生日特效
+                if (monthIndex === 9 && day === 22) {
+                    triggerBirthdaySpecialEffect();
+                }
+                // 如果是每月27號，觸發紀念日特效
+                if (day === 27) {
+                    triggerAnniversarySpecialEffect();
+                }
                 showEventModal(year, monthIndex, day);
             });
             
@@ -2325,25 +2471,6 @@ function saveNewEvent(dateKey) {
     // 從dateKey解析年月日來觸發月份特效
     const [year, month, day] = dateKey.split('-').map(Number);
     
-    // 顯示成功訊息
-    const popup = document.createElement('div');
-    popup.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 10001;
-        padding: 12px 20px;
-        background: #4CAF50;
-        color: white;
-        border-radius: 8px;
-        font-weight: bold;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    `;
-    popup.textContent = '✅ 事項已新增！';
-    document.body.appendChild(popup);
-    
-    setTimeout(() => popup.remove(), 2000);
-    
     // 關閉彈窗並重新生成日曆
     closeEventModal();
     regenerateYearlyCalendar();
@@ -2351,7 +2478,7 @@ function saveNewEvent(dateKey) {
     // 觸發月份特效
     setTimeout(() => {
         triggerMonthSpecialEffect(year, month);
-    }, 800);
+    }, 300);
     
     // 同步到雲端
     setTimeout(() => {
@@ -2363,25 +2490,6 @@ function saveNewEvent(dateKey) {
 function deleteEvent(dateKey, eventIndex) {
     if (confirm('確定要刪除這個事項嗎？')) {
         deleteEventFromDate(dateKey, eventIndex);
-        
-        // 顯示刪除成功訊息
-        const popup = document.createElement('div');
-        popup.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10001;
-            padding: 12px 20px;
-            background: #ff6b6b;
-            color: white;
-            border-radius: 8px;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        `;
-        popup.textContent = '🗑️ 事項已刪除！';
-        document.body.appendChild(popup);
-        
-        setTimeout(() => popup.remove(), 2000);
         
         // 關閉彈窗並重新生成日曆
         closeEventModal();
@@ -2428,44 +2536,15 @@ function triggerMonthSpecialEffect(year, month) {
     
     const effect = monthEffects[month];
     if (effect) {
-        // 顯示月份特效提示
-        const popup = document.createElement('div');
-        popup.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10000;
-            padding: 25px 35px;
-            background: linear-gradient(135deg, #ff9a9e, #fecfef);
-            color: white;
-            border-radius: 20px;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            text-align: center;
-            animation: popupBounce 0.8s ease-out;
-        `;
-        popup.innerHTML = `
-            <div style="font-size: 2.5em; margin-bottom: 10px;">${effect.emoji}</div>
-            <div>${month}月的${effect.name}為你綻放！</div>
-        `;
-        
-        document.body.appendChild(popup);
-        
-        // 觸發特效
-        setTimeout(() => {
-            effect.effect();
-        }, 800);
-        
-        setTimeout(() => popup.remove(), 3000);
+        // 直接觸發特效，不顯示提示框
+        effect.effect();
     }
 }
 
 // 各種月份特效
 function createSnowfall() {
-    const snowflakes = ['❄️', '⛄', '🌨️'];
-    createParticleEffect(snowflakes, 20, 5000);
+    const snowflakes = ['❄️'];
+    createParticleEffect(snowflakes, 25, 6000);
 }
 
 function createHeartRain() {
@@ -2484,8 +2563,8 @@ function createFlowerShower() {
 }
 
 function createSunbeams() {
-    const sun = ['☀️', '🌞', '⭐', '✨'];
-    createParticleEffect(sun, 12, 3500);
+    const sunflowers = ['🌻'];
+    createParticleEffect(sunflowers, 15, 4000);
 }
 
 function createSummerVibes() {
@@ -2514,13 +2593,120 @@ function createHalloweenMagic() {
 }
 
 function createThankfulSparkles() {
-    const thankful = ['🦃', '🍂', '🌽', '🥧', '✨'];
-    createParticleEffect(thankful, 18, 4200);
+    createTurkeyWalk();
 }
 
 function createChristmasJoy() {
-    const christmas = ['🎄', '🎅', '🎁', '⭐', '❄️', '🔔'];
-    createParticleEffect(christmas, 25, 5000);
+    // 聖誕老人駕雪橇
+    createSantaSleigh();
+    
+    // 禮物從天而降
+    setTimeout(() => {
+        const gifts = ['🎁'];
+        createParticleEffect(gifts, 20, 4000);
+    }, 2000);
+}
+
+// 聖誕老人駕雪橇動畫
+function createSantaSleigh() {
+    const sleigh = document.createElement('span');
+    sleigh.style.cssText = `
+        position: fixed;
+        z-index: 9998;
+        pointer-events: none;
+        user-select: none;
+        font-size: 40px;
+        right: -200px;
+        top: ${50 + Math.random() * 100}px;
+        animation: sleighFly 8s linear forwards;
+    `;
+    sleigh.textContent = '🎅🛷';
+    
+    // 添加雪橇飛行動畫樣式
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes sleighFly {
+            0% { 
+                right: -200px;
+                transform: scaleX(-1);
+            }
+            25% { 
+                transform: scaleX(-1) translateY(-10px);
+            }
+            50% { 
+                transform: scaleX(-1) translateY(5px);
+            }
+            75% { 
+                transform: scaleX(-1) translateY(-5px);
+            }
+            100% { 
+                right: calc(100vw + 200px);
+                transform: scaleX(-1) translateY(0px);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(sleigh);
+    
+    setTimeout(() => {
+        sleigh.remove();
+        style.remove();
+    }, 8000);
+}
+
+// 火雞走路動畫
+function createTurkeyWalk() {
+    const turkeyCount = 5;
+    
+    for (let i = 0; i < turkeyCount; i++) {
+        setTimeout(() => {
+            const turkey = document.createElement('span');
+            turkey.style.cssText = `
+                position: fixed;
+                z-index: 9998;
+                pointer-events: none;
+                user-select: none;
+                font-size: ${25 + Math.random() * 15}px;
+                right: -60px;
+                bottom: ${20 + Math.random() * 100}px;
+                animation: turkeyWalkRight ${8 + Math.random() * 4}s linear forwards;
+            `;
+            turkey.textContent = '🦃';
+            
+            // 添加走路動畫樣式
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes turkeyWalkRight {
+                    0% { 
+                        right: -60px;
+                        transform: scaleX(-1);
+                    }
+                    25% { 
+                        transform: scaleX(-1) translateY(-5px);
+                    }
+                    50% { 
+                        transform: scaleX(-1) translateY(0px);
+                    }
+                    75% { 
+                        transform: scaleX(-1) translateY(-3px);
+                    }
+                    100% { 
+                        right: calc(100vw + 60px);
+                        transform: scaleX(-1) translateY(0px);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(turkey);
+            
+            setTimeout(() => {
+                turkey.remove();
+                style.remove();
+            }, 12000);
+        }, i * 1500);
+    }
 }
 
 // 通用粒子效果函數
@@ -2546,6 +2732,419 @@ function createParticleEffect(particles, count, duration) {
                 particle.remove();
             }, 6000);
         }, i * (duration / count));
+    }
+}
+
+// 紀念日特效
+function triggerAnniversarySpecialEffect() {
+    // 顯示紀念日祝福彈窗
+    const anniversaryPopup = document.createElement('div');
+    anniversaryPopup.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10002;
+        padding: 30px 40px;
+        background: linear-gradient(135deg, #fff5fd, #ffb3ec, #fff5fd);
+        color: white;
+        border-radius: 20px;
+        font-size: 24px;
+        font-weight: bold;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        text-align: center;
+        animation: anniversaryBounce 1s ease-out;
+        border: 3px solid white;
+    `;
+    anniversaryPopup.innerHTML = `
+        <div style="font-size: 2em; margin-bottom: 10px;">💕</div>
+        <div>愛妳喔！</div>
+    `;
+    
+    // 添加紀念日彈跳動畫
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes anniversaryBounce {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-180deg); }
+            50% { transform: translate(-50%, -50%) scale(1.2) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(anniversaryPopup);
+    
+    // 愛心雨特效
+    setTimeout(() => {
+        createAnniversaryCelebration();
+    }, 500);
+    
+    // 移除彈窗
+    setTimeout(() => {
+        anniversaryPopup.remove();
+        style.remove();
+    }, 4000);
+}
+
+// 紀念日慶祝特效
+function createAnniversaryCelebration() {
+    // 愛心和浪漫元素從四面八方飛來
+    const loveItems = ['💕', '💖', '💗', '💓', '💘', '💝', '🌹', '💐', '✨', '⭐'];
+    const itemCount = 25;
+    
+    for (let i = 0; i < itemCount; i++) {
+        setTimeout(() => {
+            const item = document.createElement('span');
+            item.style.cssText = `
+                position: fixed;
+                z-index: 9998;
+                pointer-events: none;
+                user-select: none;
+                font-size: ${18 + Math.random() * 22}px;
+            `;
+            item.textContent = loveItems[Math.floor(Math.random() * loveItems.length)];
+            
+            // 隨機從四個方向飛入
+            const direction = Math.floor(Math.random() * 4);
+            let startX, startY, endX, endY;
+            
+            switch(direction) {
+                case 0: // 從左邊飛入
+                    startX = -60;
+                    startY = Math.random() * window.innerHeight;
+                    endX = window.innerWidth + 60;
+                    endY = Math.random() * window.innerHeight;
+                    break;
+                case 1: // 從右邊飛入
+                    startX = window.innerWidth + 60;
+                    startY = Math.random() * window.innerHeight;
+                    endX = -60;
+                    endY = Math.random() * window.innerHeight;
+                    break;
+                case 2: // 從上面飛入
+                    startX = Math.random() * window.innerWidth;
+                    startY = -60;
+                    endX = Math.random() * window.innerWidth;
+                    endY = window.innerHeight + 60;
+                    break;
+                case 3: // 從下面飛入
+                    startX = Math.random() * window.innerWidth;
+                    startY = window.innerHeight + 60;
+                    endX = Math.random() * window.innerWidth;
+                    endY = -60;
+                    break;
+            }
+            
+            item.style.left = startX + 'px';
+            item.style.top = startY + 'px';
+            
+            const duration = 4 + Math.random() * 3;
+            item.style.animation = `anniversaryFly${i} ${duration}s ease-out forwards`;
+            
+            // 為每個元素創建獨特的動畫
+            const itemStyle = document.createElement('style');
+            itemStyle.textContent = `
+                @keyframes anniversaryFly${i} {
+                    0% { 
+                        left: ${startX}px; 
+                        top: ${startY}px; 
+                        transform: scale(0) rotate(0deg);
+                        opacity: 0;
+                    }
+                    20% { 
+                        transform: scale(1.2) rotate(180deg);
+                        opacity: 1;
+                    }
+                    80% { 
+                        transform: scale(1) rotate(360deg);
+                        opacity: 1;
+                    }
+                    100% { 
+                        left: ${endX}px; 
+                        top: ${endY}px; 
+                        transform: scale(0.5) rotate(720deg);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(itemStyle);
+            
+            document.body.appendChild(item);
+            
+            setTimeout(() => {
+                item.remove();
+                itemStyle.remove();
+            }, duration * 1000);
+        }, i * 80);
+    }
+    
+    // 額外的愛心爆炸效果
+    setTimeout(() => {
+        createLoveExplosion();
+    }, 1500);
+}
+
+// 愛心爆炸效果
+function createLoveExplosion() {
+    const hearts = ['💕', '💖'];
+    const heartCount = 18;
+    
+    for (let i = 0; i < heartCount; i++) {
+        setTimeout(() => {
+            const heart = document.createElement('span');
+            heart.style.cssText = `
+                position: fixed;
+                font-size: ${15 + Math.random() * 15}px;
+                z-index: 9999;
+                pointer-events: none;
+                user-select: none;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            `;
+            heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+            
+            const angle = (i / heartCount) * 2 * Math.PI;
+            const distance = 120 + Math.random() * 180;
+            const endX = Math.cos(angle) * distance;
+            const endY = Math.sin(angle) * distance;
+            
+            const duration = 2 + Math.random() * 1;
+            heart.style.animation = `loveBurst${i} ${duration}s ease-out forwards`;
+            
+            const heartStyle = document.createElement('style');
+            heartStyle.textContent = `
+                @keyframes loveBurst${i} {
+                    0% { 
+                        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+                        opacity: 1;
+                    }
+                    50% { 
+                        transform: translate(calc(-50% + ${endX * 0.7}px), calc(-50% + ${endY * 0.7}px)) scale(1.5) rotate(180deg);
+                        opacity: 1;
+                    }
+                    100% { 
+                        transform: translate(calc(-50% + ${endX}px), calc(-50% + ${endY}px)) scale(0.3) rotate(360deg);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(heartStyle);
+            
+            document.body.appendChild(heart);
+            
+            setTimeout(() => {
+                heart.remove();
+                heartStyle.remove();
+            }, duration * 1000);
+        }, i * 60);
+    }
+}
+
+// Ania生日特效
+function triggerBirthdaySpecialEffect() {
+    // 顯示生日祝福彈窗
+    const birthdayPopup = document.createElement('div');
+    birthdayPopup.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10002;
+        padding: 30px 40px;
+        background: linear-gradient(135deg, #ff9a9e, #fecfef, #ffd93d);
+        color: white;
+        border-radius: 20px;
+        font-size: 24px;
+        font-weight: bold;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        text-align: center;
+        animation: birthdayBounce 1s ease-out;
+        border: 3px solid white;
+    `;
+    birthdayPopup.innerHTML = `
+        <div style="font-size: 2em; margin-bottom: 10px;">🎂</div>
+        <div>Happy Birthday Ania!</div>
+        <div style="font-size: 0.8em; margin-top: 8px; opacity: 0.9;">生日快樂！愛妳喔！🎉</div>
+    `;
+    
+    // 添加生日彈跳動畫
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes birthdayBounce {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-180deg); }
+            50% { transform: translate(-50%, -50%) scale(1.2) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(birthdayPopup);
+    
+    // 生日蛋糕和氣球特效
+    setTimeout(() => {
+        createBirthdayCelebration();
+    }, 500);
+    
+    // 移除彈窗
+    setTimeout(() => {
+        birthdayPopup.remove();
+        style.remove();
+    }, 4000);
+}
+
+// 生日慶祝特效
+function createBirthdayCelebration() {
+    // 彩色氣球和蛋糕從四面八方飛來
+    const birthdayItems = ['🎂', '🎈', '🎁', '🎉', '🎊', '🥳', '🍰', '🎀'];
+    const itemCount = 30;
+    
+    for (let i = 0; i < itemCount; i++) {
+        setTimeout(() => {
+            const item = document.createElement('span');
+            item.style.cssText = `
+                position: fixed;
+                z-index: 9998;
+                pointer-events: none;
+                user-select: none;
+                font-size: ${20 + Math.random() * 25}px;
+            `;
+            item.textContent = birthdayItems[Math.floor(Math.random() * birthdayItems.length)];
+            
+            // 隨機從四個方向飛入
+            const direction = Math.floor(Math.random() * 4);
+            let startX, startY, endX, endY;
+            
+            switch(direction) {
+                case 0: // 從左邊飛入
+                    startX = -60;
+                    startY = Math.random() * window.innerHeight;
+                    endX = window.innerWidth + 60;
+                    endY = Math.random() * window.innerHeight;
+                    break;
+                case 1: // 從右邊飛入
+                    startX = window.innerWidth + 60;
+                    startY = Math.random() * window.innerHeight;
+                    endX = -60;
+                    endY = Math.random() * window.innerHeight;
+                    break;
+                case 2: // 從上面飛入
+                    startX = Math.random() * window.innerWidth;
+                    startY = -60;
+                    endX = Math.random() * window.innerWidth;
+                    endY = window.innerHeight + 60;
+                    break;
+                case 3: // 從下面飛入
+                    startX = Math.random() * window.innerWidth;
+                    startY = window.innerHeight + 60;
+                    endX = Math.random() * window.innerWidth;
+                    endY = -60;
+                    break;
+            }
+            
+            item.style.left = startX + 'px';
+            item.style.top = startY + 'px';
+            
+            const duration = 4 + Math.random() * 3;
+            item.style.animation = `birthdayFly${i} ${duration}s ease-out forwards`;
+            
+            // 為每個元素創建獨特的動畫
+            const itemStyle = document.createElement('style');
+            itemStyle.textContent = `
+                @keyframes birthdayFly${i} {
+                    0% { 
+                        left: ${startX}px; 
+                        top: ${startY}px; 
+                        transform: scale(0) rotate(0deg);
+                        opacity: 0;
+                    }
+                    20% { 
+                        transform: scale(1.2) rotate(180deg);
+                        opacity: 1;
+                    }
+                    80% { 
+                        transform: scale(1) rotate(360deg);
+                        opacity: 1;
+                    }
+                    100% { 
+                        left: ${endX}px; 
+                        top: ${endY}px; 
+                        transform: scale(0.5) rotate(720deg);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(itemStyle);
+            
+            document.body.appendChild(item);
+            
+            setTimeout(() => {
+                item.remove();
+                itemStyle.remove();
+            }, duration * 1000);
+        }, i * 100);
+    }
+    
+    // 額外的彩帶爆炸效果
+    setTimeout(() => {
+        createConfettiExplosion();
+    }, 1500);
+}
+
+// 彩帶爆炸效果
+function createConfettiExplosion() {
+    const confetti = ['🎊', '🎉'];
+    const confettiCount = 20;
+    
+    for (let i = 0; i < confettiCount; i++) {
+        setTimeout(() => {
+            const piece = document.createElement('span');
+            piece.style.cssText = `
+                position: fixed;
+                font-size: ${15 + Math.random() * 15}px;
+                z-index: 9999;
+                pointer-events: none;
+                user-select: none;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            `;
+            piece.textContent = confetti[Math.floor(Math.random() * confetti.length)];
+            
+            const angle = (i / confettiCount) * 2 * Math.PI;
+            const distance = 150 + Math.random() * 200;
+            const endX = Math.cos(angle) * distance;
+            const endY = Math.sin(angle) * distance;
+            
+            const duration = 2 + Math.random() * 1;
+            piece.style.animation = `confettiBurst${i} ${duration}s ease-out forwards`;
+            
+            const confettiStyle = document.createElement('style');
+            confettiStyle.textContent = `
+                @keyframes confettiBurst${i} {
+                    0% { 
+                        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+                        opacity: 1;
+                    }
+                    50% { 
+                        transform: translate(calc(-50% + ${endX * 0.7}px), calc(-50% + ${endY * 0.7}px)) scale(1.5) rotate(180deg);
+                        opacity: 1;
+                    }
+                    100% { 
+                        transform: translate(calc(-50% + ${endX}px), calc(-50% + ${endY}px)) scale(0.3) rotate(360deg);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(confettiStyle);
+            
+            document.body.appendChild(piece);
+            
+            setTimeout(() => {
+                piece.remove();
+                confettiStyle.remove();
+            }, duration * 1000);
+        }, i * 50);
     }
 }
 
@@ -2981,7 +3580,9 @@ window.addEventListener('load', function() {
     // 在初始化後添加固定課程
     setTimeout(() => {
         addFixedScheduleForAnia();
-    }, 100);
+        addFixedScheduleForDog();
+        updateTodaySchedule(); // 確保今日行程也更新
+    }, 500);
     
     // 自動從雲端載入資料
     setTimeout(() => {
@@ -2998,6 +3599,6 @@ window.addEventListener('load', function() {
 
 </script>
 
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'977e6e2f43b8a112',t:'MTc1NjY2MzI1Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'977ef69ff15e50ec',t:'MTc1NjY2ODg0Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
 
