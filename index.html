@@ -668,6 +668,13 @@
     transform: scale(1);
   }
 }
+            @font-face {
+    font-family: 'RoundedBold';  /* 這是你自己取的名字，後面引用用 */
+    src: url('Font/rounded.med.boldttf.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 
                 }
         
@@ -694,7 +701,7 @@
    <h1 style="
           font-weight: 500;
           font-size: 22px;
-          font-family: 'Comic Sans MS', cursive, sans-serif;
+          font-family: 'RoundedBold', 'Comic Sans MS', cursive, sans-serif;
           color: #737373;
           opacity: 1;
           animation: textSlide 1s ease 0.5s forwards;
@@ -702,6 +709,7 @@
    <p id="loadingMessage" style="
           margin-top: 5px;
           font-size: 16px;
+          font-family: 'RoundedBold', 'Comic Sans MS', cursive, sans-serif;
           color: #ffffff;
           opacity: 1;
           transition: opacity 0.5s ease;
