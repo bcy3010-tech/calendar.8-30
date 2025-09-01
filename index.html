@@ -652,7 +652,7 @@
 </head>
 <body>
   <!-- 歡迎頁面 -->
- <div id="splash" style="
+<div id="splash" style="
     position: fixed;
     top: 0;
     left: 0;
@@ -660,21 +660,23 @@
     height: 100%;
     background: #fff8d0;
     display: flex;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;
     z-index: 9999;
     font-family: '微軟正黑體', sans-serif;
     color: #4a5568;
 ">
-    <!-- 圖片置中 -->
-    <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
-        <img src="ania.yu.png" alt="Logo" style="width: 200px;">
-    </div>
-
-    <!-- 文字放在圖片下方 -->
-    <div style="text-align: center; margin-bottom: 50px;">
-        <h1 style="font-weight: bold; font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 2em;">歡迎來到我們的行事曆</h1>
-    </div>
-</div>
+    <img src="ania.yu.png" alt="Logo" style="width: 360px; margin-bottom: 20px; opacity: 0; transform: scale(0.5); animation: logoPop 1s ease forwards;">
+   <h1 style="
+          font-weight: bold;
+          font-size: 28px;
+          font-family: 'Comic Sans MS', cursive, sans-serif;
+          color: #4a5568;
+          opacity: 0;
+          animation: textSlide 1s ease 0.5s forwards;
+      ">歡迎來到我們的行事曆</h1>
+  </div>
 
 <header>
     <nav>
@@ -4192,13 +4194,21 @@ window.addEventListener('load', function() {
 </script>
 <script>
 window.addEventListener('load', () => {
-  const splash = document.getElementById('splash');
-  const main = document.getElementById('mainContent');
+    const splash = document.getElementById('splash');
+    const mainContent = document.getElementById('mainContent');
 
-  setTimeout(() => {
-    splash.style.display = 'none';
-    main.style.display = 'block';
-  }, 2000);
+    // 延遲顯示主內容
+    setTimeout(() => {
+        // 加入淡出動畫
+        splash.style.transition = 'opacity 1s';
+        splash.style.opacity = '0';
+
+        // 動畫結束後隱藏歡迎頁面，顯示主內容
+        splash.addEventListener('transitionend', () => {
+            splash.style.display = 'none';
+            mainContent.style.display = 'block';
+        });
+    }, 2000); // 2秒後開始淡出
 });
 </script>
 
