@@ -4308,16 +4308,30 @@ window.addEventListener('load', function() {
 });
 
 </script>
-  <script>
+<script>
         // 讓載入訊息有動態效果
         let dots = 0;
         const loadingMessage = document.getElementById('loadingMessage');
         const baseText = '已載入資料🍚';
         
-        setInterval(() => {
+        const dotsInterval = setInterval(() => {
             dots = (dots + 1) % 4;
             loadingMessage.textContent = baseText + '.'.repeat(dots);
         }, 500);
+
+        // 3秒後淡出歡迎頁面
+        setTimeout(() => {
+            const splash = document.getElementById('splash');
+            splash.style.animation = 'fadeOut 1s ease forwards';
+            
+            // 清除載入動畫
+            clearInterval(dotsInterval);
+            
+            // 1秒後完全移除元素
+            setTimeout(() => {
+                splash.remove();
+            }, 1000);
+        }, 3000);
     </script>
 
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9780299905e24f0e',t:'MTc1NjY4MTQxOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
