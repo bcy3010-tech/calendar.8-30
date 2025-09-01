@@ -56,40 +56,65 @@
             background: #FFECF5;
         }
 
-        nav {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            width: 180px;
-        }
+  /* nav 容器一直顯示 */
+nav {
+    position: relative;
+}
 
-        nav button {
-            background: #dae8fc;
-            color: #333;
-            border: none;
-            padding: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 18px;
-            transition: all 0.3s ease;
-            font-weight: 300;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+/* 漢堡按鈕 */
+.hamburger {
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
 
-        nav button:hover {
-            background: #c5dbf7;
-            transform: scale(1.1);
-        }
+/* 選單初始隱藏 */
+#menu {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    position: absolute;
+    top: 100%;  /* 調整到漢堡正下方 */
+    left: 0;  /* 對齊漢堡左側 */
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
 
-        nav button.active {
-            background: #b3d9ff;
-            transform: scale(1.15);
-        }
+/* 點漢堡展開選單 */
+#menu.show {
+    display: flex;
+}
+
+/* 選單按鈕樣式 */
+#menu button {
+    background: #dae8fc;
+    color: #333;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 300;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#menu button:hover {
+    background: #c5dbf7;
+    transform: scale(1.1);
+}
+
+#menu button.active {
+    background: #b3d9ff;
+    transform: scale(1.15);
+}
 
         h1 {
             font-size: 2.5em;
@@ -826,13 +851,16 @@
         </div>
     </div>
 <header>
-    <nav>
+ <nav>
+  <button class="hamburger" onclick="toggleMenu()">☰</button>
+  <div id="menu">
         <button id="btn-page1" class="active" onclick="showPage(1)" title="行事曆">📅</button>
         <button id="btn-page2" onclick="showPage(2); setTimeout(triggerSakura, 300);" title="空白頁">🌸</button>
         <button id="btn-page3" onclick="showPage(3)" title="Ania的週行程">🍜</button>
         <button id="btn-page4" onclick="showPage(4)" title="小狗的週行程">🍙</button>
         <button id="btn-page5" onclick="showPage(5)" title="年度行事曆">🍱</button>
-    </nav>
+   </div>
+ </nav>
     <h1 id="main-title">行事曆</h1>
 </header>
 
@@ -4372,7 +4400,12 @@ window.addEventListener('load', function() {
             }, 1000);
         }, 3000);
     </script>
-
+<script>
+function toggleMenu() {
+  document.getElementById("menu").classList.toggle("show");
+}
+</script>
+  
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9780299905e24f0e',t:'MTc1NjY4MTQxOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
