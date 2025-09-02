@@ -1183,7 +1183,7 @@ nav {
 // Import Firebase functions
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-
+ 
 // Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAaIYqI841frW8fAdVXRActEuxPBba4bq4",
@@ -1392,6 +1392,10 @@ window.loadFromFirebase = loadFromFirebase;
 </script>
 
 <script>
+function toggleMenu() {
+  const menu = document.getElementById('menu');
+  menu.classList.toggle('show');
+}
 // 分頁切換
 function showPage(pageNum){
     document.getElementById('page1').classList.remove('active');
@@ -4428,25 +4432,7 @@ window.addEventListener('load', function() {
             }, 1000);
         }, 3000);
     </script>
-<script>
-  // 漢堡切換選單
-  function toggleMenu() {
-    const menu = document.getElementById("menu");
-    menu.classList.toggle("show");
-  }
 
-  // 點擊空白處收起選單
-  document.addEventListener("click", function(event) {
-    const menu = document.getElementById("menu");
-    const hamburger = document.querySelector(".hamburger");
-
-    if (menu.classList.contains("show") &&
-        !menu.contains(event.target) &&
-        !hamburger.contains(event.target)) {
-      menu.classList.remove("show");
-    }
-  });
-</script>
 
   
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9780299905e24f0e',t:'MTc1NjY4MTQxOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
