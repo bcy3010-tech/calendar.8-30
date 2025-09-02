@@ -1907,6 +1907,12 @@ initScheduleTable("scheduleTableB", "scheduleBodyB");
 
 // 為 Ania 的行事曆添加固定課程
 function addFixedScheduleForAnia() {
+    // 先清除現有的固定課程，避免重複
+    const existingTasks = document.querySelectorAll('#scheduleTableA .task');
+    existingTasks.forEach(task => {
+        task.remove();
+    });
+
     const fixedClasses = [
         { days: [1, 3, 5], startHour: 9, startMin: 30, endHour: 10, endMin: 20, subject: "Counterpoint", color: "#d5e8d4" },
         { days: [1, 3, 5], startHour: 10, startMin: 35, endHour: 11, endMin: 25, subject: "Music History", color: "#dae8fc" },
@@ -1916,51 +1922,68 @@ function addFixedScheduleForAnia() {
         { days: [4], startHour: 11, startMin: 30, endHour: 12, endMin: 30, subject: "Piano Practicum", color: "#ffe6cc" }
     ];
 
+    console.log('開始添加 Ania 的固定課程...'); // 除錯用
+
     fixedClasses.forEach(classInfo => {
         classInfo.days.forEach(day => {
             const startHour = classInfo.startHour;
             const cell = document.querySelector(`#scheduleTableA td[data-day='${day}'][data-hour='${startHour}']`);
-            
+
+            console.log(`嘗試添加課程: ${classInfo.subject}, 日期: ${day}, 時間: ${startHour}, 找到格子:`, cell);
+
             if (cell) {
                 const totalMinutes = (classInfo.endHour * 60 + classInfo.endMin) - (classInfo.startHour * 60 + classInfo.startMin);
                 const heightPerMinute = 40/60;
                 const taskHeight = totalMinutes * heightPerMinute;
-                
+
                 const task = document.createElement("div");
-                task.className = "task fixed-task";
+                task.className = "task ania-fixed-task";
                 task.textContent = classInfo.subject;
                 task.style.backgroundColor = classInfo.color;
                 task.style.top = `${classInfo.startMin * heightPerMinute}px`;
                 task.style.height = `${taskHeight}px`;
                 task.style.border = "2px solid #666";
                 task.style.fontWeight = "bold";
-                
-                // 添加刪除按鈕（可編輯）
+
+                // ⭐ 加上關鍵樣式，讓它真的浮在格子裡
+                task.style.position = "absolute";
+                task.style.left = "2px";
+                task.style.right = "2px";
+                task.style.display = "flex";
+                task.style.justifyContent = "center";
+                task.style.alignItems = "center";
+                task.style.fontSize = "13px";
+                task.style.color = "#4a5568";
+
+                // 添加刪除按鈕
                 const delBtn = document.createElement("button");
                 delBtn.className = "delete-btn";
                 delBtn.textContent = "✕";
                 delBtn.onclick = () => {
                     task.remove();
                     updateTodaySchedule();
-                    if (task.textContent.includes('Practice')) {
-                        checkPracticeHours();
-                    }
                     saveToFirebase();
                 };
-                
+
                 // 檢查編輯模式狀態
                 const editMode = document.getElementById('editModeA').checked;
                 if (editMode) {
                     delBtn.classList.add('edit-mode');
                 }
-                
+
                 task.appendChild(delBtn);
-                
+
                 cell.appendChild(task);
+                console.log(`成功添加課程: ${classInfo.subject}`);
+            } else {
+                console.log(`找不到格子: day=${day}, hour=${startHour}`);
             }
         });
     });
+
+    console.log('Ania 固定課程添加完成');
 }
+
 
 // 為小狗的行事曆添加固定課程
 function addFixedScheduleForDog() {
