@@ -1864,49 +1864,77 @@
         headers[i].innerHTML = `${dayNames[i-1]}<br><span style="font-size: 0.8em; color: #666;">${month}/${date}</span>`;
       }
     }
-    initScheduleTable("scheduleTableA", "scheduleBodyA"); 
-    initScheduleTable("scheduleTableB", "scheduleBodyB"); 
-    
 
-// 初始化表格函式，保留你原本的 initScheduleTable
+
+// 初始化表格安全版
 function initScheduleTableSafe(tableId, bodyId) {
-  return new Promise((resolve) => {
-    initScheduleTable(tableId, bodyId); // 原本生成表格的程式碼
-    resolve(); // 表格生成完成
-  });
+    return new Promise((resolve) => {
+        console.log(`🚀 開始初始化表格: ${tableId}`);
+
+        initScheduleTable(tableId, bodyId);
+
+        function checkTableReady() {
+            const table = document.getElementById(tableId);
+            const cells = table ? table.querySelectorAll('td[data-day][data-hour]') : [];
+
+            console.log(`📊 檢查表格 ${tableId}:`, {
+                存在: !!table,
+                行數: table ? table.rows.length : 0,
+                格子數: cells.length
+            });
+
+            if (table && table.rows.length > 0 && cells.length > 0) {
+                console.log(`✅ 表格 ${tableId} 準備完成`);
+                table.offsetHeight; // 強制重排
+                setTimeout(resolve, 100); // 額外等待一個渲染週期
+            } else {
+                console.log(`⏳ 表格 ${tableId} 尚未準備好，繼續等待...`);
+                setTimeout(checkTableReady, 150);
+            }
+        }
+
+        setTimeout(checkTableReady, 50);
+    });
 }
 
-// 確保表格生成完成再添加固定課程
-function ensureAniaSchedule() {
-  const tableA = document.getElementById("scheduleTableA");
-  const tableB = document.getElementById("scheduleTableB");
+// 安全添加固定課程
+function ensureFixedSchedules() {
+    console.log('=== 開始檢查表格狀態 ===');
 
-  if (
-    tableA && tableA.rows.length > 0 &&
-    tableB && tableB.rows.length > 0
-  ) {
-    // 強制重排，確保 iOS Safari 看到表格
-    tableA.offsetHeight;
-    tableB.offsetHeight;
+    const tableA = document.getElementById("scheduleTableA");
+    const tableB = document.getElementById("scheduleTableB");
+    const cellsA = tableA ? tableA.querySelectorAll('td[data-day][data-hour]') : [];
+    const cellsB = tableB ? tableB.querySelectorAll('td[data-day][data-hour]') : [];
 
-    addFixedScheduleForAnia();
-    addFixedScheduleForDog();
-  } else {
-    // 表格尚未生成，下一幀再檢查
-    requestAnimationFrame(ensureAniaSchedule);
-  }
+    console.log('📊 表格A狀態:', { 存在: !!tableA, 行數: tableA ? tableA.rows.length : 0, 格子數: cellsA.length });
+    console.log('📊 表格B狀態:', { 存在: !!tableB, 行數: tableB ? tableB.rows.length : 0, 格子數: cellsB.length });
+
+    if (tableA && cellsA.length > 0 && tableB && cellsB.length > 0) {
+        console.log('✅ 兩個表格都準備好了，開始添加固定課程');
+
+        tableA.offsetHeight;
+        tableB.offsetHeight;
+
+        try { addFixedScheduleForAnia(); console.log('✅ Ania 固定課程添加完成'); }
+        catch (error) { console.error('❌ Ania 添加失敗:', error); setTimeout(() => { try { addFixedScheduleForAnia(); console.log('✅ Ania 重試成功'); } catch(e){console.error('❌ Ania 重試也失敗:', e);} }, 500); }
+
+        try { addFixedScheduleForDog(); console.log('✅ 小狗固定課程添加完成'); }
+        catch (error) { console.error('❌ 小狗添加失敗:', error); }
+
+    } else {
+        console.log('⏳ 表格尚未完全準備好，繼續等待...');
+        setTimeout(ensureFixedSchedules, 300);
+    }
 }
 
-// DOM 載入完成後開始初始化
+// DOM 完全載入後啟動
 document.addEventListener("DOMContentLoaded", () => {
-  // 生成表格
-  Promise.all([
-    initScheduleTableSafe("scheduleTableA", "scheduleBodyA"),
-    initScheduleTableSafe("scheduleTableB", "scheduleBodyB")
-  ]).then(() => {
-    // 開始安全檢查，直到表格生成完成才加固定課程
-    ensureAniaSchedule();
-  });
+    Promise.all([
+        initScheduleTableSafe("scheduleTableA", "scheduleBodyA"),
+        initScheduleTableSafe("scheduleTableB", "scheduleBodyB")
+    ]).then(() => {
+        ensureFixedSchedules();
+    });
 });
 
 
