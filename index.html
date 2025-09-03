@@ -1864,22 +1864,27 @@
         headers[i].innerHTML = `${dayNames[i-1]}<br><span style="font-size: 0.8em; color: #666;">${month}/${date}</span>`;
       }
     }
- // 假設 initScheduleTable 改成回傳 Promise
-function initScheduleTableAsync(tableId, bodyId) {
-  return new Promise((resolve) => {
-    initScheduleTable(tableId, bodyId); // 原本生成表格的程式
-    resolve(); // 生成完成後通知
-  });
+// 確保表格生成完成後再加固定課程
+function ensureAniaSchedule() {
+  const tableA = document.getElementById("scheduleTableA");
+  const tableB = document.getElementById("scheduleTableB");
+
+  if (tableA && tableA.rows.length > 0 && tableB && tableB.rows.length > 0) {
+    // 表格都生成完成，加入固定課程
+    addFixedScheduleForAnia();
+    addFixedScheduleForDog();
+  } else {
+    // 表格尚未生成，延遲再試一次
+    setTimeout(ensureAniaSchedule, 100);
+  }
 }
 
-// 生成兩個表格，等兩個都完成後再加固定課程
-Promise.all([
-  initScheduleTableAsync("scheduleTableA", "scheduleBodyA"),
-  initScheduleTableAsync("scheduleTableB", "scheduleBodyB")
-]).then(() => {
-  addFixedScheduleForAnia();
-  addFixedScheduleForDog();
+document.addEventListener("DOMContentLoaded", () => {
+  initScheduleTable("scheduleTableA", "scheduleBodyA");
+  initScheduleTable("scheduleTableB", "scheduleBodyB");
+  ensureAniaSchedule(); // 呼叫安全檢查
 });
+
 
     // 為 Ania 的行事曆添加固定課程
     function addFixedScheduleForAnia() {
