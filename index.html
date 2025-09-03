@@ -1484,14 +1484,6 @@
       popup.textContent = '內容已儲存！💕';
       document.body.appendChild(popup);
       setTimeout(() => popup.remove(), 2000);
-      // 獲取當前月份並觸發特效
-      const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth() + 1; // JavaScript月份是0-based，所以要+1
-      // 觸發月份特別效果
-      setTimeout(() => {
-        triggerMonthSpecialEffect(currentYear, currentMonth);
-      }, 800);
       // 同時儲存到雲端
       setTimeout(() => {
         saveToFirebase();
