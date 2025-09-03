@@ -1864,25 +1864,49 @@
         headers[i].innerHTML = `${dayNames[i-1]}<br><span style="font-size: 0.8em; color: #666;">${month}/${date}</span>`;
       }
     }
-// 確保表格生成完成後再加固定課程
+    initScheduleTable("scheduleTableA", "scheduleBodyA"); 
+    initScheduleTable("scheduleTableB", "scheduleBodyB"); 
+    
+
+// 初始化表格函式，保留你原本的 initScheduleTable
+function initScheduleTableSafe(tableId, bodyId) {
+  return new Promise((resolve) => {
+    initScheduleTable(tableId, bodyId); // 原本生成表格的程式碼
+    resolve(); // 表格生成完成
+  });
+}
+
+// 確保表格生成完成再添加固定課程
 function ensureAniaSchedule() {
   const tableA = document.getElementById("scheduleTableA");
   const tableB = document.getElementById("scheduleTableB");
 
-  if (tableA && tableA.rows.length > 0 && tableB && tableB.rows.length > 0) {
-    // 表格都生成完成，加入固定課程
+  if (
+    tableA && tableA.rows.length > 0 &&
+    tableB && tableB.rows.length > 0
+  ) {
+    // 強制重排，確保 iOS Safari 看到表格
+    tableA.offsetHeight;
+    tableB.offsetHeight;
+
     addFixedScheduleForAnia();
     addFixedScheduleForDog();
   } else {
-    // 表格尚未生成，延遲再試一次
-    setTimeout(ensureAniaSchedule, 100);
+    // 表格尚未生成，下一幀再檢查
+    requestAnimationFrame(ensureAniaSchedule);
   }
 }
 
+// DOM 載入完成後開始初始化
 document.addEventListener("DOMContentLoaded", () => {
-  initScheduleTable("scheduleTableA", "scheduleBodyA");
-  initScheduleTable("scheduleTableB", "scheduleBodyB");
-  ensureAniaSchedule(); // 呼叫安全檢查
+  // 生成表格
+  Promise.all([
+    initScheduleTableSafe("scheduleTableA", "scheduleBodyA"),
+    initScheduleTableSafe("scheduleTableB", "scheduleBodyB")
+  ]).then(() => {
+    // 開始安全檢查，直到表格生成完成才加固定課程
+    ensureAniaSchedule();
+  });
 });
 
 
