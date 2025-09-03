@@ -1864,14 +1864,23 @@
         headers[i].innerHTML = `${dayNames[i-1]}<br><span style="font-size: 0.8em; color: #666;">${month}/${date}</span>`;
       }
     }
-    // 初始化A和B的週行程表
-    initScheduleTable("scheduleTableA", "scheduleBodyA");
-    initScheduleTable("scheduleTableB", "scheduleBodyB");
-    // 確保表格生成完成後再添加固定課程
-    setTimeout(() => {
-      addFixedScheduleForAnia();
-      addFixedScheduleForDog();
-    }, 100);
+ // 假設 initScheduleTable 改成回傳 Promise
+function initScheduleTableAsync(tableId, bodyId) {
+  return new Promise((resolve) => {
+    initScheduleTable(tableId, bodyId); // 原本生成表格的程式
+    resolve(); // 生成完成後通知
+  });
+}
+
+// 生成兩個表格，等兩個都完成後再加固定課程
+Promise.all([
+  initScheduleTableAsync("scheduleTableA", "scheduleBodyA"),
+  initScheduleTableAsync("scheduleTableB", "scheduleBodyB")
+]).then(() => {
+  addFixedScheduleForAnia();
+  addFixedScheduleForDog();
+});
+
     // 為 Ania 的行事曆添加固定課程
     function addFixedScheduleForAnia() {
       console.log('=== 開始 Ania 固定課程添加 ===');
